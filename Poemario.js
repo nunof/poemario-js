@@ -110,7 +110,7 @@
       const GRACEFUL = 2;
       const STATEFUL = 3;
 
-      var DEBUG = true;
+      var DEBUG = false;
       var w_height = 0;
       var w_width = 0;
       var timers = new Array();
@@ -131,6 +131,7 @@
       var max_cfont = 0;
       var live = new Array();
       var wp_tstamp = Date.now();
+
       //Internal global vars serving as private storage for properties
       var _firstp, _flow_mode, _type_mode, _poem_speed, _type_speed, _num_poems, _list_poems, _top_pixels, _has_audio, _sounds_origin, _font_config;
       typeof first_mode === 'undefined' ? _first_mode = POEM_STATIC : _first_mode = first_mode;
@@ -253,7 +254,7 @@
               live.push(new Array());
               for (i = 1; i <= _num_poems; i++) {
                   $("#body").append("<div class=\"container\" id=\"container" + String(i) + "\" style=\"overflow-y: scroll;\"></div>");
-                  if (_type_mode == TYPE_CONSTELLATION)
+                  if (_type_mode == TYPE_CONSTELLATION) {
                       $("#container" + String(i)).append("<canvas class=\"canvas\" id=\"canvas" + String(i) + "\" style=\"display: block;\"></canvas>");
                   document.addEventListener('keydown', keydown_func = function(event) {
                       const key_name = event.key;
@@ -281,6 +282,7 @@
               live.push(new Array());
               go_poem(i, new Array(), timers.length - 2, timers.length - 1, true);
           }
+        }
       };
 
       //Public method for stopping poem generation.
@@ -419,24 +421,24 @@
       // Public method to post to local WP - the instantaneous poem with the associated image
       Poemario.prototype.image_wp = function(pnum) {
           if (_flow_mode == FLOW_STATIC_ALL) {
-              if (DEBUG) console.log("WP: image post called for pnum " + pnum);
+            if (DEBUG) console.log("WP: image post called for pnum " + pnum);
 
-              if (typeof pnum === 'undefined') pnum = 1;
+            if (typeof pnum === 'undefined') pnum = 1;
 
-              var ptxt = "";
-              for (var i = 0; i < live[pnum].length; i++) {
-                  ptxt += live[pnum][i][1] + "\n";
-              }
+            var ptxt = "";
+            for (var i = 0; i < live[pnum].length; i++) {
+                ptxt += live[pnum][i][1] + "\n";
+            }
 
-              var wp_req = new XMLHttpRequest();
-              wp_req.open("POST", "http://telepoesis.net/cgi-bin/wp_image.pl", true);
+            var wp_req = new XMLHttpRequest();
+            wp_req.open("POST", "http://telepoesis.net/cgi-bin/wp_image.pl", true);
 
-              wp_req.onload = function (obj_event) {
-                  //console.log("inside 2");
-                  // uploaded.
-              };
+            wp_req.onload = function (obj_event) {
+                //console.log("inside 2");
+                // uploaded.
+            };
 
-              wp_req.onreadystatechange = function() { // Call a function when the state changes.
+            wp_req.onreadystatechange = function() { // Call a function when the state changes.
                 if (DEBUG) console.log("state changed");
                 if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
                     if (DEBUG) console.log("ok");
@@ -444,6 +446,7 @@
                 else {
                     if (DEBUG) console.log("nok: there's a problem");
                 }
+            }
 
               var obj_canvas = document.getElementById('canvas' + pnum);
               var ctx_canvas = document.getElementById('canvas' + pnum).getContext('2d');
@@ -543,7 +546,7 @@
                       window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
                       if (_first_mode != POEM_STATIC) {
                           for (var i = 0; i < live[pnum].length; i++) {
-                              _type_mode ==  ? add_vers_canvas(new Array(live[pnum][i][0], " "), pnum, i) : add_vers(new Array(live[pnum][i][0], " "), pnum, i);
+                              _type_mode == TYPE_CONSTELLATION ? add_vers_canvas(new Array(live[pnum][i][0], " "), pnum, i) : add_vers(new Array(live[pnum][i][0], " "), pnum, i);
                           }
                           //start poem animation
                           first_poem(poem, pnum, 0, 0, id_timer1, id_timer2);
@@ -889,7 +892,8 @@
           if (_type_mode == TYPE_CONSTELLATION) {
               $("#canvas" + pnum).attr('height', ($('#container' + pnum).height() - 20) + 'px');
               $("#canvas" + pnum).attr('width', ($('#container' + pnum).width() - 20) + 'px');
-          } else scroll_bottom("#container" + pnum);
+          } 
+          else scroll_bottom("#container" + pnum);
       };
 
 
