@@ -461,7 +461,8 @@
                   //fd.append("txt", encodeURIComponent(ptxt));
                   //fd.append("img", obj_canvas.toDataURL("image/png"));
                   //wp_req.send(fd);
-                  wp_req.send('txt=' + encodeURIComponent(ptxt) + '&img=' + encodeURIComponent(obj_canvas.toDataURL("image/png")));
+                  var clean_txt = ptxt.replace(/_/g, " ");
+                  wp_req.send('txt=' + encodeURIComponent(clean_txt) + '&img=' + encodeURIComponent(obj_canvas.toDataURL("image/png")));
                   if (DEBUG) console.log("WP: posted");
               };
 
