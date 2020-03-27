@@ -131,6 +131,7 @@
       var max_cfont = 0;
       var live = new Array();
       var wp_tstamp = Date.now();
+      var max_num_poems = new Array();
 
       //Internal global vars serving as private storage for properties
       var _firstp, _flow_mode, _type_mode, _poem_speed, _type_speed, _num_poems, _list_poems, _top_pixels, _has_audio, _sounds_origin, _font_config;
@@ -158,66 +159,66 @@
       //Public properties
       Object.defineProperty(Poemario.prototype, "flow_mode", {
           configurable: true,
-          get: function() {
+          get: function () {
               return _flow_mode;
           },
-          set: function(newval) {
+          set: function (newval) {
               _flow_mode = newval;
           }
       });
 
       Object.defineProperty(Poemario.prototype, "type_mode", {
           configurable: true,
-          get: function() {
+          get: function () {
               return _type_mode;
           },
-          set: function(newval) {
+          set: function (newval) {
               _type_mode = newval;
           }
       });
 
       Object.defineProperty(Poemario.prototype, "poem_speed", {
           configurable: true,
-          get: function() {
+          get: function () {
               return _poem_speed;
           },
-          set: function(newval) {
+          set: function (newval) {
               _poem_speed = newval;
           }
       });
 
       Object.defineProperty(Poemario.prototype, "type_speed", {
           configurable: true,
-          get: function() {
+          get: function () {
               return _type_speed;
           },
-          set: function(newval) {
+          set: function (newval) {
               _type_speed = newval;
           }
       });
 
       Object.defineProperty(Poemario.prototype, "top_pixels", {
           configurable: true,
-          get: function() {
+          get: function () {
               return _top_pixels;
           },
-          set: function(newval) {
+          set: function (newval) {
               _top_pixels = newval;
           }
       });
 
       Object.defineProperty(Poemario.prototype, "font_config", {
           configurable: true,
-          get: function() {
+          get: function () {
               return _font_config;
           },
-          set: function(newval) {
+          set: function (newval) {
               _font_config = newval;
           }
       });
 
       //Public method for stoping everything
-      Poemario.prototype.all_stop = function() {
+      Poemario.prototype.all_stop = function () {
           if (txt_running !== undefined) {
               stop_timers();
               $(".container p").remove();
@@ -243,7 +244,7 @@
       };
 
       //Public method for starting things
-      Poemario.prototype.txt_start = function() {
+      Poemario.prototype.txt_start = function () {
 
           if (txt_running === undefined) {
               txt_running = RUNNING;
@@ -256,52 +257,51 @@
                   $("#body").append("<div class=\"container\" id=\"container" + String(i) + "\" style=\"overflow-y: scroll;\"></div>");
                   if (_type_mode == TYPE_CONSTELLATION) {
                       $("#container" + String(i)).append("<canvas class=\"canvas\" id=\"canvas" + String(i) + "\" style=\"display: block;\"></canvas>");
-                  document.addEventListener('keydown', keydown_func = function(event) {
-                      const key_name = event.key;
+                      document.addEventListener('keydown', keydown_func = function (event) {
+                          const key_name = event.key;
 
-                      if (key_name === 'Control') return;
-                      if (key_name === 'Alt') return;
+                          if (key_name === 'Control') return;
+                          if (key_name === 'Alt') return;
 
-                      if (event.ctrlKey && event.altKey && key_name === 's') {
-                          if (DEBUG) console.log("Keyboard event to wp_image");
-                          if ((Date.now() - wp_tstamp) / 1000 > 10) {
-                              wp_tstamp = Date.now();
-                              Poemario.prototype.image_wp(1);
-                              if (DEBUG) console.log("... sent");
-                          } 
-                          else {
-                              if (DEBUG) console.log("... not sent");
+                          if (event.ctrlKey && event.altKey && key_name === 's') {
+                              if (DEBUG) console.log("Keyboard event to wp_image");
+                              if ((Date.now() - wp_tstamp) / 1000 > 10) {
+                                  wp_tstamp = Date.now();
+                                  Poemario.prototype.image_wp(1);
+                                  if (DEBUG) console.log("... sent");
+                              } else {
+                                  if (DEBUG) console.log("... not sent");
+                              }
                           }
-                      }
-                  }, false);
+                      }, false);
+                  }
+                  timers.push(0);
+                  timers.push(0);
+                  window["block_counter" + i] = 0;
+                  if (DEBUG) console.log("type_mode => " + String(_type_mode));
+                  live.push(new Array());
+                  go_poem(i, new Array(), timers.length - 2, timers.length - 1, true);
               }
-              timers.push(0);
-              timers.push(0);
-              window["block_counter" + i] = 0;
-              if (DEBUG) console.log("type_mode => " + String(_type_mode));
-              live.push(new Array());
-              go_poem(i, new Array(), timers.length - 2, timers.length - 1, true);
           }
-        }
       };
 
       //Public method for stopping poem generation.
       //Does nothing if not running. Only flags Poemario to stop, but effectively it only stops when it reaches end of current poem
-      Poemario.prototype.txt_stop_graceful = function() {
+      Poemario.prototype.txt_stop_graceful = function () {
           if (txt_running !== undefined)
               if (txt_running == RUNNING) txt_running = GRACEFUL;
       };
 
       //Public method for stopping poem generation.
       //Does nothing if not running. But flags Poemario to stop immediately and save state on the next timeout function
-      Poemario.prototype.txt_stop_stateful = function() {
+      Poemario.prototype.txt_stop_stateful = function () {
           if (txt_running !== undefined)
               if (txt_running == RUNNING) txt_running = STATEFUL;
       };
 
       //Public method for resuming poem generation. It knows if it's being called after STATEFUL or GRACEFUL stop
       //Does nothing unless Poemario is initialized and stopped
-      Poemario.prototype.txt_resume = function() {
+      Poemario.prototype.txt_resume = function () {
 
           if (txt_running !== undefined) {
               if (txt_running == GRACEFUL) {
@@ -317,7 +317,7 @@
 
       //Public method for resetting poem
       //Does nothing unless Poemario is initialized
-      Poemario.prototype.txt_reset = function() {
+      Poemario.prototype.txt_reset = function () {
 
           if (txt_running !== undefined) {
               stop_timers();
@@ -328,7 +328,7 @@
       };
 
       //Public method to start playing two audio streams.
-      Poemario.prototype.audio_start = function(frequency) {
+      Poemario.prototype.audio_start = function (frequency) {
 
           if (_has_audio) {
               if (snd_running !== undefined) {
@@ -342,7 +342,7 @@
       };
 
       //Public method to stop plying the two audio streams
-      Poemario.prototype.audio_stop = function(stop_now) {
+      Poemario.prototype.audio_stop = function (stop_now) {
 
           if (_has_audio) {
               if (typeof stop_now === 'undefined') stop_now = true;
@@ -366,21 +366,20 @@
       };
 
       //Public method to start fading out audio streams
-      Poemario.prototype.audio_fade_out = function(steps, callback) {
+      Poemario.prototype.audio_fade_out = function (steps, callback) {
 
           if (_has_audio) {
               if (typeof steps === 'undefined') steps = 200;
               if (snd_running !== undefined) {
                   if (DEBUG) console.log("AUDIO ALL: fading out...");
                   if (snd_running == RUNNING) {
-                      audio_fade_tmr = setInterval(function() {
+                      audio_fade_tmr = setInterval(function () {
                           var tmp_volume = audio1.volume;
                           if (tmp_volume > 0) {
                               tmp_volume -= .1;
                               audio1.volume = Math.floor(tmp_volume * 10) / 10;
                               audio2.volume = audio1.volume;
-                          } 
-                          else {
+                          } else {
                               clearInterval(audio_fade_tmr);
                               if ($.isFunction(callback)) callback();
                           }
@@ -392,7 +391,7 @@
 
 
       //Public method to resume audio streams
-      Poemario.prototype.audio_resume = function() {
+      Poemario.prototype.audio_resume = function () {
 
           if (_has_audio) {
               if (snd_running !== undefined) {
@@ -402,10 +401,10 @@
                           audio1.play();
                           audio2.play();
                       } else {
-                          audio1.addEventListener("ended", audio_func1 = function() {
+                          audio1.addEventListener("ended", audio_func1 = function () {
                               audio_again(1);
                           }, false);
-                          audio2.addEventListener("ended", audio_func2 = function() {
+                          audio2.addEventListener("ended", audio_func2 = function () {
                               audio_again(2);
                           }, false);
                           audio_again(1);
@@ -418,35 +417,62 @@
 
       };
 
+      // Public method to retrieve number of possible poems
+      Poemario.prototype.get_num_max_poems = function (pnum) {
+          if (DEBUG) console.log("max_num_poems " + JSON.stringify(max_num_poems));
+          if (max_num_poems[parseInt(pnum) - 1] > Number.MAX_SAFE_INTEGER) return ">="+Number.MAX_SAFE_INTEGER.toLocaleString()
+          else return max_num_poems[parseInt(pnum) - 1].toLocaleString();
+      }
+
+      // Public method to post to local WP - the instantaneous poem text
+      Poemario.prototype.text_wp = function (pnum, poem_user) {
+          if (_type_mode != TYPE_CONSTELLATION) {
+              if (typeof pnum === 'undefined') pnum = 1;
+              if (DEBUG) console.log("WP: text post called for pnum " + pnum);
+
+              var ptxt = "";
+              for (var i = 0; i < live[pnum].length; i++) {
+                  ptxt += live[pnum][i][1] + "\n";
+              }
+
+              var wp_req = new XMLHttpRequest();
+              wp_req.open("POST", "http://telepoesis.net/cgi-bin/wp_text.pl", true);
+              var clean_txt = ptxt.replace(/_/g, " ");
+              var params = 'poem=' + encodeURIComponent(clean_txt);
+              if (poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
+              wp_req.send(params);
+              if (DEBUG) console.log("WP: posted");
+          }
+      };
+
       // Public method to post to local WP - the instantaneous poem with the associated image
-      Poemario.prototype.image_wp = function(pnum) {
-          if (_flow_mode == FLOW_STATIC_ALL) {
-            if (DEBUG) console.log("WP: image post called for pnum " + pnum);
+      Poemario.prototype.image_wp = function (pnum) {
+          if (_type_mode == TYPE_CONSTELLATION) {
 
-            if (typeof pnum === 'undefined') pnum = 1;
+              if (typeof pnum === 'undefined') pnum = 1;
+              if (DEBUG) console.log("WP: image post called for pnum " + pnum);
 
-            var ptxt = "";
-            for (var i = 0; i < live[pnum].length; i++) {
-                ptxt += live[pnum][i][1] + "\n";
-            }
+              var ptxt = "";
+              for (var i = 0; i < live[pnum].length; i++) {
+                  ptxt += live[pnum][i][1] + "\n";
+              }
 
-            var wp_req = new XMLHttpRequest();
-            wp_req.open("POST", "http://telepoesis.net/cgi-bin/wp_image.pl", true);
+              var wp_req = new XMLHttpRequest();
+              wp_req.open("POST", "http://telepoesis.net/cgi-bin/wp_image.pl", true);
 
-            wp_req.onload = function (obj_event) {
-                //console.log("inside 2");
-                // uploaded.
-            };
+              wp_req.onload = function (obj_event) {
+                  //console.log("inside 2");
+                  // uploaded.
+              };
 
-            wp_req.onreadystatechange = function() { // Call a function when the state changes.
-                if (DEBUG) console.log("state changed");
-                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                    if (DEBUG) console.log("ok");
-                }
-                else {
-                    if (DEBUG) console.log("nok: there's a problem");
-                }
-            }
+              wp_req.onreadystatechange = function () { // Call a function when the state changes.
+                  if (DEBUG) console.log("state changed");
+                  if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                      if (DEBUG) console.log("ok");
+                  } else {
+                      if (DEBUG) console.log("nok: there's a problem");
+                  }
+              }
 
               var obj_canvas = document.getElementById('canvas' + pnum);
               var ctx_canvas = document.getElementById('canvas' + pnum).getContext('2d');
@@ -490,12 +516,12 @@
               type: "GET",
               url: _list_poems[parseInt(pnum) - 1],
               dataType: "xml",
-              success: function(xml) {
+              success: function (xml) {
                   var $parsed = $(xml);
                   var $texto = $parsed.find("texto");
 
                   //load element texto into 2 lists, poem (unchanging verso, ordem e taxon) and live (changing, verso and indentation)
-                  $texto.each(function() {
+                  $texto.each(function () {
                       var $entry = $(this);
                       var verso = $entry.attr("verso");
                       var ordem = $entry.attr("ordem");
@@ -506,11 +532,12 @@
 
                   //load element categorias into objs stored in DOM window dictionary
                   var $cats = $parsed.find("categorias");
-                  $cats.contents().each(function(i, el) {
+                  max_num_poems.push(0);
+                  $cats.contents().each(function (i, el) {
                       if (el.nodeType == 1) {
                           $element = $parsed.find(el.nodeName);
                           window[el.nodeName] = new Array();
-                          $element.contents().each(function() {
+                          $element.contents().each(function () {
                               var $elem = $(this);
                               elem = $.trim($elem.text());
                               if (elem.length > 0) window[el.nodeName].push(elem);
@@ -518,13 +545,15 @@
                       }
                   });
 
+                  calculate_max_num_poems(pnum, poem);
+
                   //load element audio into objs stored in DOM window dictionary
                   var $audio = $parsed.find("audio");
-                  $audio.contents().each(function(i, el) {
+                  $audio.contents().each(function (i, el) {
                       if (el.nodeType == 1) {
                           $element = $parsed.find(el.nodeName);
                           window[el.nodeName] = new Array();
-                          $element.contents().each(function() {
+                          $element.contents().each(function () {
                               var $elem = $(this);
                               elem = $.trim($elem.text());
                               if (elem.length > 0) window[el.nodeName].push(elem);
@@ -580,6 +609,7 @@
                           Poemario.prototype.audio_start.call(this, 2000);
                       }
                   }
+
               }
           });
 
@@ -600,14 +630,14 @@
                   if (lnum >= live[pnum].length - 1) {
                       clearTimeout(timers[id_timer2]);
                       add_vers_canvas(live[pnum][lnum], pnum, lnum);
-                      timers[id_timer1] = setTimeout(function() {
+                      timers[id_timer1] = setTimeout(function () {
                           main_task(poem, pnum, 0, id_timer1, id_timer2)
                       }, _poem_speed);
                   }
                   //not last vers
                   else {
                       add_vers_canvas(live[pnum][lnum], pnum, lnum);
-                      timers[id_timer2] = setTimeout(function() {
+                      timers[id_timer2] = setTimeout(function () {
                           first_poem(poem, pnum, lnum + 1, typing_pos, id_timer1, id_timer2)
                       }, _poem_speed);
                   }
@@ -618,7 +648,7 @@
                       clearTimeout(timers[id_timer2]);
                       if (_flow_mode == FLOW_STATIC_ONE) set_vers(live[pnum][lnum][1], pnum, lnum);
                       else add_vers(live[pnum][lnum], pnum, lnum);
-                      timers[id_timer1] = setTimeout(function() {
+                      timers[id_timer1] = setTimeout(function () {
                           main_task(poem, pnum, 0, id_timer1, id_timer2)
                       }, _poem_speed);
                   }
@@ -626,7 +656,7 @@
                   else {
                       if (_flow_mode == FLOW_STATIC_ONE) set_vers(live[pnum][lnum][1], pnum, lnum);
                       else add_vers(live[pnum][lnum], pnum, lnum);
-                      timers[id_timer2] = setTimeout(function() {
+                      timers[id_timer2] = setTimeout(function () {
                           first_poem(poem, pnum, lnum + 1, typing_pos, id_timer1, id_timer2)
                       }, _poem_speed);
                   }
@@ -709,14 +739,14 @@
               window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
               i = Math.floor(Math.random() * live[pnum].length);
               add_vers_canvas(live[pnum][i], pnum, i);
-              timers[id_timer1] = setTimeout(function() {
+              timers[id_timer1] = setTimeout(function () {
                   main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
               }, _poem_speed);
           }
           //static length poem, vers by vers
           else if ((_flow_mode == FLOW_STATIC_ONE || _flow_mode == FLOW_STATIC_ALL) && _type_mode == TYPE_LINE) {
               set_vers(live[pnum][i][1], pnum, i);
-              timers[id_timer1] = setTimeout(function() {
+              timers[id_timer1] = setTimeout(function () {
                   main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
               }, _poem_speed);
           }
@@ -726,7 +756,7 @@
               for (i = 0; i < live[pnum].length; i++) {
                   add_vers(live[pnum][i], pnum, i);
               }
-              timers[id_timer1] = setTimeout(function() {
+              timers[id_timer1] = setTimeout(function () {
                   main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
               }, _poem_speed);
           }
@@ -737,7 +767,7 @@
               //static length poem
               if (_flow_mode == FLOW_STATIC_ONE || _flow_mode == FLOW_STATIC_ALL) {
                   set_vers("", pnum, i);
-                  timers[id_timer2] = setTimeout(function() {
+                  timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, i, typing_pos, id_timer1, id_timer2, false)
                   }, _type_speed);
               }
@@ -747,7 +777,7 @@
                   for (i = 0; i < live[pnum].length; i++) {
                       add_vers(new Array(live[pnum][i][0], " "), pnum, i);
                   }
-                  timers[id_timer2] = setTimeout(function() {
+                  timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, 0, typing_pos, id_timer1, id_timer2, false)
                   }, _type_speed);
               }
@@ -773,13 +803,13 @@
               //if first_poem we always print it whole
               if (is_initial && lnum < live[pnum].length - 1) {
                   if (live[pnum][lnum][1].length == 0) set_vers("", pnum, lnum);
-                  timers[id_timer2] = setTimeout(function() {
+                  timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, lnum + 1, 0, id_timer1, id_timer2, is_initial)
                   }, _poem_speed);
               } else {
                   clearTimeout(timers[id_timer2]);
                   set_vers(partial, pnum, lnum);
-                  timers[id_timer1] = setTimeout(function() {
+                  timers[id_timer1] = setTimeout(function () {
                       main_task(poem, pnum, 0, id_timer1, id_timer2)
                   }, _poem_speed);
               }
@@ -787,14 +817,14 @@
               //we are still in the middle of a vers
               if (typing_pos <= live[pnum][lnum][1].length) {
                   set_vers(partial, pnum, lnum);
-                  timers[id_timer2] = setTimeout(function() {
+                  timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, lnum, typing_pos, id_timer1, id_timer2, is_initial)
                   }, _type_speed);
               }
               //we are going to start a new vers
               else {
                   if (live[pnum][lnum][1].length == 0) set_vers("", pnum, lnum);
-                  timers[id_timer2] = setTimeout(function() {
+                  timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, lnum + 1, 0, id_timer1, id_timer2, is_initial)
                   }, _type_speed);
               }
@@ -893,8 +923,7 @@
           if (_type_mode == TYPE_CONSTELLATION) {
               $("#canvas" + pnum).attr('height', ($('#container' + pnum).height() - 20) + 'px');
               $("#canvas" + pnum).attr('width', ($('#container' + pnum).width() - 20) + 'px');
-          } 
-          else scroll_bottom("#container" + pnum);
+          } else scroll_bottom("#container" + pnum);
       };
 
 
@@ -924,26 +953,26 @@
           snds_idx = Math.floor(Math.random() * snd_arr_a.length);
           audio1.setAttribute("src", snd_arr_a[snds_idx]);
           //audio1.addEventListener("loadedmetadata", function(){ duration = audio1.duration }, false);
-          audio1.addEventListener("canplay", function() {
+          audio1.addEventListener("canplay", function () {
               if (snd_running == RUNNING) {
                   if (DEBUG) console.log("AUDIO1: playing new");
                   audio1.play()
               }
           }, false);
-          audio1.addEventListener("ended", audio_func1 = function() {
+          audio1.addEventListener("ended", audio_func1 = function () {
               audio_again(1);
           }, false);
 
           snds_idx = Math.floor(Math.random() * snd_arr_b.length);
           audio2.setAttribute("src", snd_arr_b[snds_idx]);
           //audio2.addEventListener("loadedmetadata", function(){ duration = audio2.duration }, false );
-          audio2.addEventListener("canplay", function() {
+          audio2.addEventListener("canplay", function () {
               if (snd_running == RUNNING) {
                   if (DEBUG) console.log("AUDIO2: playing new");
                   audio2.play()
               }
           }, false);
-          audio2.addEventListener("ended", audio_func2 = function() {
+          audio2.addEventListener("ended", audio_func2 = function () {
               audio_again(2);
           }, false);
 
@@ -959,7 +988,7 @@
 
               case 1:
                   if (DEBUG) console.log("AUDIO1: rescheduling");
-                  audio_tmr1 = setTimeout(function() {
+                  audio_tmr1 = setTimeout(function () {
                       snds_idx = Math.floor(Math.random() * snd_arr_a.length);
                       audio1.setAttribute("src", snd_arr_a[snds_idx]);
                       if (DEBUG) console.log("AUDIO1: loading new");
@@ -968,7 +997,7 @@
                   break;
               case 2:
                   if (DEBUG) console.log("AUDIO2: rescheduling");
-                  audio_tmr2 = setTimeout(function() {
+                  audio_tmr2 = setTimeout(function () {
                       snds_idx = Math.floor(Math.random() * snd_arr_b.length);
                       audio2.setAttribute("src", snd_arr_b[snds_idx]);
                       if (DEBUG) console.log("AUDIO2: loading new");
@@ -997,6 +1026,7 @@
           return txt_array;
       }
 
+      //Private method for validating font config
       function validate_font_config(fc) {
 
           if (!'color' in fc) fc.color = 'black';
@@ -1009,8 +1039,7 @@
 
               if (match === null) {
                   if (typeof fc.pixels != 'number' || fc.pixels < 0 || fc.pixels > 48) fc.pixels = 16;
-              } 
-              else {
+              } else {
                   if (match[1] >= match[2])
                       fc.pixels = match[1];
                   else {
@@ -1019,22 +1048,52 @@
                       max_cfont = parseInt(match[2]);
                   }
               }
-          } 
-          else fc.pixels = 16;
+          } else fc.pixels = 16;
 
           if ('style' in fc) {
               if (typeof fc.style !== 'string' || (fc.style != 'normal' && fc.style != 'bold' && fc.style != 'italic'))
                   fc.style = 'normal';
-          } 
-          else fc.style = 'normal';
+          } else fc.style = 'normal';
 
 
           if ('alpha' in fc) {
               if (typeof fc.alpha !== 'number' || fc.alpha < 0 || fc.alpha > 1) fc.alpha = 1;
-          } 
-          else fc.alpha = 1;
+          } else fc.alpha = 1;
 
           return fc;
 
+      }
+
+      //Private method for creating and filling array with the contents of a txt file with URL
+      function calculate_max_num_poems(pnum, poem) {
+            _tmp_all = 1;
+            //console.log("window obj " + unwrap_circular_obj(window));
+            for (i = 0; i < poem.length; i++) {
+                _tmp_vers = 1;
+                _taxons = poem[i][2].split(",");
+                for (j = 0; j < _taxons.length; j++) {
+                    if (typeof _taxons[j] !== 'undefined' && typeof window[_taxons[j]] !== 'undefined') 
+                        _tmp_vers *= window[_taxons[j]].length;
+                }
+                _tmp_all *= _tmp_vers;
+            }
+            max_num_poems[pnum-1] = _tmp_all;
+      }
+
+      //Private method to stringify circular objects
+      function unwrap_circular_obj(obj) {
+          var cache = [];
+          _tmp = JSON.stringify(obj, function (key, value) {
+              if (typeof value === 'object' && value !== null) {
+                  if (cache.indexOf(value) !== -1) {
+                      return;
+                  }
+                  cache.push(value);
+              }
+              return value;
+          });
+          // Enable garbage collection
+          cache = null;
+          return _tmp;
       }
   };
