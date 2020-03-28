@@ -15,7 +15,7 @@ my $pictureurl;
 
 # settings
 my $username = "perl";
-my $password = "PMmUPZw9TkBy";
+my $password = &getpasswd;
 my $server = "http://telepoesis.net/poemario/xmlrpc.php";
 my $htmlpost = "real content tester";
 
@@ -100,4 +100,15 @@ sub getcgivars {
 	$in{"txt"} = $ptxt;
 
 	return %in;
+}
+
+sub getpasswd {
+	my $content;
+    open(my $fh, '<', "wp-perl-password.txt") or die "cannot get password";
+    {
+        local $/;
+        $content = <$fh>;
+    }
+    close($fh);
+	return $content;
 }

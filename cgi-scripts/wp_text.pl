@@ -5,9 +5,8 @@ use WordPress;
 
 my $poem_user = "Anonimo";
 my $wp_user = "perl";
-my $wp_pass = "PMmUPZw9TkBy";
+my $wp_pass = &getpasswd;
 my $wp_server = "http://telepoesis.net/poemario/xmlrpc.php";
-my $htmlpost = "real content tester";
 my $poem = "teste";
 my $wpdir = "Poemas";
 my $is_ok = &getcgivars();
@@ -87,4 +86,15 @@ sub getcgivars {
     $poem_user = param("poem_user");
     $wpdir = param("wpdir");
 	return 1;
+}
+
+sub getpasswd {
+	my $content;
+    open(my $fh, '<', "wp-perl-password.txt") or die "cannot get password";
+    {
+        local $/;
+        $content = <$fh>;
+    }
+    close($fh);
+	return $content;
 }
