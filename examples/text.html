@@ -8,9 +8,12 @@
     <title>Poemario js library</title>
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type="text/javascript" src="../Poemario.js"></script>
 
     <script type="text/javascript">
+      //$(document).ready(function(){
+        $("#msgconfirmation").dialog({ autoOpen: false });
         var pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 100, ["poem1.xml", "poem2.xml"], 0, false, "config");
 
         function switch_poemario() {
@@ -22,7 +25,19 @@
             pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 50, list_poems, 0, true, "config");
             pmr.txt_start();
         }
+
+        function post_text(pnum) {
+          var author = prompt("You are about to post to Poemario blog, what's your name?", "Harry Potter");
+
+          if (author != null) {
+            pmr.text_wp(1, author);
+            //window.confirm("Arigato! You should be able to see your poem in https://telepoesis.net/poemario")
+            $("#msgconfirmation").dialog();
+          } 
+        }
+      //});
     </script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">        
 </head>
 
 <body id="body" onload="pmr.txt_start();">
@@ -49,8 +64,11 @@
       <button type="button" onclick="pmr.audio_stop();">stop audio (now)</button>
       <button type="button" onclick="pmr.audio_stop(false);">stop audio (after current sounds)</button>
       <button type="button" onclick="pmr.audio_resume();">resume audio (accordingly)</button>
-      <button type="button" onclick="pmr.text_wp(1, 'demo');">post text from poem 1 to WP</button>
+      <button type="button" onclick="post_text(1)">post text from poem 1 to WP</button>
       <div id="bottom-right" style="position:absolute;top:8px;right:16px;z-index:10;color:yellowgreen"></div>
+  </div>
+  <div id="msgconfirmation" title="Posted to Poemario">
+    <p>Arigato! You should be able to see your poem <a href="https://telepoesis.net/poemario" target="_blank">here</a></p>
   </div>
   <p id="output" style="font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; font-size:small"></p>
 
