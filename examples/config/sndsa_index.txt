@@ -1,0 +1,2 @@
+./soundsa/SmallExplosion8-Bit.ogg
+./soundsa/Soft_Airy_Swish.ogg

@@ -1,0 +1,2 @@
+./soundsb/Metal_Hit.ogg
+./soundsb/KirbyStyleLaser.ogg

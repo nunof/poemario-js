@@ -1,0 +1,24 @@
+*{
+    margin:0;
+    padding:0;
+}
+
+.vers {
+ font-family: times, Times New Roman, times-roman, georgia, serif;
+ font-size: 16px;
+ line-height: 20px;
+ color: #444;
+}
+
+.container {
+ overflow: auto;
+ padding-top:0px;
+}
+
+label {
+ font-size: 10px;
+}
+
+.canvas {
+ background:url(pcanvas.jpg)
+}
