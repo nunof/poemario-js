@@ -439,7 +439,7 @@
               wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
               var clean_txt = ptxt.replace(/_/g, " ");
               var params = 'poem=' + encodeURIComponent(clean_txt);
-              if (poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
+              if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
               wp_req.send(params);
               if (DEBUG) console.log("WP: posted");
           }
