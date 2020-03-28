@@ -434,10 +434,11 @@
               for (var i = 0; i < live[pnum].length; i++) {
                   ptxt += live[pnum][i][1] + "\n";
               }
+              var clean_txt = ptxt.replace(/_/g, " ");              
 
               var wp_req = new XMLHttpRequest();
               wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
-              var clean_txt = ptxt.replace(/_/g, " ");
+              xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
               var params = 'poem=' + encodeURIComponent(clean_txt);
               if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
               wp_req.send(params);

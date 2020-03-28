@@ -1,6 +1,7 @@
 #! /usr/bin/perl 
 use CGI qw(:standard);
 use WordPress;
+use URI::Escape;
 #use Data::Dumper;
 
 my $poem_user = "Anonimo";
@@ -79,12 +80,12 @@ sub getcgivars {
 	my $req_method = $ENV{'REQUEST_METHOD'};
 	return 0 unless($req_method eq 'POST');
 
-	my $main_param = param("poem");
+	my $main_param = uri_unescape(param("poem"));
 	return 0 unless (defined($main_param) && length($main_param) > 0);
 
     $poem = $main_param;
-    $poem_user = param("poem_user");
-    $wpdir = param("wpdir");
+    $poem_user = uri_unescape(param("poem_user"));
+    $wpdir = uri_unescape(param("wpdir"));
 	return 1;
 }
 
