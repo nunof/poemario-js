@@ -436,7 +436,7 @@
               }
 
               var wp_req = new XMLHttpRequest();
-              wp_req.open("POST", "https://telepoesis.net/cgi-bin/wp_text.pl", true);
+              wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
               var clean_txt = ptxt.replace(/_/g, " ");
               var params = 'poem=' + encodeURIComponent(clean_txt);
               if (poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
