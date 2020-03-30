@@ -12,30 +12,30 @@
     <script type="text/javascript" src="../Poemario.js"></script>
 
     <script type="text/javascript">
-      //$(document).ready(function(){
+      var pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 100, ["poem1.xml", "poem2.xml"], 0, false, "config");
+      function switch_poemario() {
+        var combo = document.getElementById("whichone");
+        pmr.all_stop();
+        delete pmr;
+        var str_tmp = combo.options[combo.selectedIndex].value;
+        list_poems = str_tmp.replace(/ /g, '').split(',');
+        pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 50, list_poems, 0, true, "config");
+        pmr.txt_start();
+      }
+
+      function post_text(pnum) {
+        var author = prompt("You are about to post to Poemario blog, what's your name?", "Harry Potter");
+
+        if (author != null) {
+          pmr.text_wp(1, author);
+          $("#msgconfirmation").dialog("open");
+        } 
+      }
+
+      $(document).ready(function(){
         $("#msgconfirmation").dialog({ autoOpen: false });
-        var pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 100, ["poem1.xml", "poem2.xml"], 0, false, "config");
 
-        function switch_poemario() {
-            var combo = document.getElementById("whichone");
-            pmr.all_stop();
-            delete pmr;
-            var str_tmp = combo.options[combo.selectedIndex].value;
-            list_poems = str_tmp.replace(/ /g, '').split(',');
-            pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 50, list_poems, 0, true, "config");
-            pmr.txt_start();
-        }
-
-        function post_text(pnum) {
-          var author = prompt("You are about to post to Poemario blog, what's your name?", "Harry Potter");
-
-          if (author != null) {
-            pmr.text_wp(1, author);
-            //window.confirm("Arigato! You should be able to see your poem in https://telepoesis.net/poemario")
-            $("#msgconfirmation").dialog();
-          } 
-        }
-      //});
+      });
     </script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">        
 </head>
