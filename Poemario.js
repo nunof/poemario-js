@@ -438,7 +438,7 @@
 
               var wp_req = new XMLHttpRequest();
               wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
-              xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+              wp_req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
               var params = 'poem=' + encodeURIComponent(clean_txt);
               if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
               wp_req.send(params);
