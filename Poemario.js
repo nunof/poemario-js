@@ -145,16 +145,18 @@
       typeof has_audio === 'undefined' ? _has_audio = false : _has_audio = has_audio;
       _sounds_origin = sounds_origin;
 
-      if (typeof font_config === 'undefined')
-          _font_config = {
+      _num_poems = _list_poems.length;
+
+      if (typeof font_config === 'undefined') {
+          _font_config = new Array(1);
+          _font_config[0] = {
               family: 'arial, sans-serif',
               pixels: 16,
               style: 'normal',
               alpha: 1
           };
-      else _font_config = validate_font_config(font_config);
-
-      _num_poems = _list_poems.length;
+      }
+      else _font_config = process_font_config(font_config);
 
       //Public properties
       Object.defineProperty(Poemario.prototype, "flow_mode", {
@@ -870,16 +872,16 @@
           var clean_line = arr[1].replace(/_/g, " ");
           var ctx = document.getElementById('canvas' + pnum).getContext('2d');
 
-          if (_font_config.pixels == 0) pxs = String(Math.floor(Math.random() * (max_cfont - min_cfont)) + min_cfont) + 'px';
-          else pxs = String(_font_config.pixels) + 'px';
-          ctx.font = _font_config.style + " " + pxs + " " + _font_config.family;
+          if (_font_config[pnum-1].pixels == 0) pxs = String(Math.floor(Math.random() * (max_cfont - min_cfont)) + min_cfont) + 'px';
+          else pxs = String(_font_config[pnum-1].pixels) + 'px';
+          ctx.font = _font_config[pnum-1].style + " " + pxs + " " + _font_config[pnum-1].family;
 
-          ctx.globalAlpha = _font_config.alpha;
+          ctx.globalAlpha = _font_config[pnum-1].alpha;
 
           y = Math.floor(Math.random() * ($('#canvas' + pnum).height() - 1) + 1);
           x = Math.floor(Math.random() * ($('#canvas' + pnum).width() - 1) + 1);
 
-          ctx.fillStyle = _font_config.color;
+          ctx.fillStyle = _font_config[pnum-1].color;
           var t_width = ctx.measureText(clean_line).width;
           //TODO: fix me: this is not really accurate. Saving 20 pixels as workaround
           if (x + t_width >= w_width) x = w_width - t_width - 20;
@@ -1041,6 +1043,23 @@
               txt_array.pop()
           }
           return txt_array;
+      }
+
+      //Private method for processing font config - can be list or javascript object
+      function process_font_config(fc0) {
+        var new_fc = new Array(_num_poems);
+        if (Array.isArray(fc0) && fc0.length == _num_poems) {
+            for (i = 0; i < fc0.length; i++) { 
+                new_fc[i] = validate_font_config(fc0[i]);
+            }
+        }
+        else {
+            _tmp = validate_font_config(fc0);
+            for (i = 0; i < _num_poems; i++) { 
+                new_fc[i] = _tmp;
+            }
+        }
+        return new_fc;
       }
 
       //Private method for validating font config
