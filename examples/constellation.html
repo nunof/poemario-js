@@ -20,7 +20,7 @@
             delete pmr;
             var str_tmp = combo.options[combo.selectedIndex].value;
             list_poems = str_tmp.replace(/ /g, '').split(',');
-            pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_CONSTELLATION, 800, 50, list_poems, 0, true, "config", {family: "times, sans-serif", pixels: "12-28", style: "bold", alpha: 0.3});
+            pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_CONSTELLATION, 800, 50, list_poems, 0, true, "config", {family: "times, sans-serif", pixels: "12-28", style: "bold", color: "green", alpha: 0.8});
             pmr.txt_start();
         }
     </script>
