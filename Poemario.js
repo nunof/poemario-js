@@ -222,6 +222,9 @@
           if (txt_running !== undefined) {
               stop_timers();
               $(".container p").remove();
+              $(".container").remove();
+              $(".bckgnd").remove();
+              $("#free-top").remove();
           }
           if (_has_audio) {
               if (snd_running !== undefined) {
@@ -250,13 +253,14 @@
               txt_running = RUNNING;
               $('head').append($('<link rel="stylesheet" type="text/css" />').attr('href', 'css/Poemario.css'));
               $("#body").append("<div id=\"free-top\"></div>");
+              $("#body").append("<div class=\"bckgnd\" id=\"bckgnd0\" style=\"overflow: auto;\"></div>");
 
               //index 0 will always be empty because we're using pnum as an index - it starts with 1
               live.push(new Array());
               for (i = 1; i <= _num_poems; i++) {
                   $("#body").append("<div class=\"container\" id=\"container" + String(i) + "\" style=\"overflow-y: scroll;\"></div>");
                   if (_type_mode == TYPE_CONSTELLATION) {
-                      $("#container" + String(i)).append("<canvas class=\"canvas\" id=\"canvas" + String(i) + "\" style=\"display: block;\"></canvas>");
+                      $("#container" + String(i)).append("<canvas class=\"canvas\" id=\"canvas" + String(i) + "\"></canvas>");
                       document.addEventListener('keydown', keydown_func = function (event) {
                           const key_name = event.key;
 
@@ -909,6 +913,18 @@
               "z-index": "1"
           });
 
+          $('#bckgnd0').height(w_height - _top_pixels) + 'px';
+          $('#bckgnd0').width(w_width) + 'px';
+          $("#bckgnd0").parent().css({
+              position: 'relative'
+          });
+          $("#bckgnd0").css({
+              top: 1 + top_pixels,
+              left: 1,
+              position: 'absolute',
+              "z-index": "1"
+          });
+
           $('#container' + pnum).height(w_height - _top_pixels) + 'px';
           $('#container' + pnum).width(w_width / _num_poems) + 'px';
           $("#container" + pnum).parent().css({
@@ -918,7 +934,7 @@
               top: 1 + top_pixels,
               left: (pnum - 1) * (w_width / _num_poems),
               position: 'absolute',
-              "z-index": "1"
+              "z-index": "2"
           });
 
           if (_type_mode == TYPE_CONSTELLATION) {
