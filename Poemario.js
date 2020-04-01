@@ -127,8 +127,6 @@
       var snd_arr_a = undefined;
       var snd_arr_b = undefined;
       var snd_freq = 2000;
-      var min_cfont = 0;
-      var max_cfont = 0;
       var live = new Array();
       var wp_tstamp = Date.now();
       var max_num_poems = new Array();
@@ -148,13 +146,19 @@
       _num_poems = _list_poems.length;
 
       if (typeof font_config === 'undefined') {
-          _font_config = new Array(1);
-          _font_config[0] = {
-              family: 'arial, sans-serif',
-              pixels: 16,
-              style: 'normal',
-              alpha: 1
-          };
+        //we take font config from css if type_mode != TYPE_CONSTELLATION
+        if (_type_mode == TYPE_CONSTELLATION) {
+            _font_config = new Array(_num_poems);
+            for (i = 0; i < _num_poems; i++) {
+                _font_config[i] = {
+                    family: 'arial, sans-serif',
+                    pixels: '12',
+                    style: 'italic',
+                    color: 'blue',
+                    alpha: 1
+                };
+            }
+        }
       }
       else _font_config = process_font_config(font_config);
 
@@ -862,9 +866,20 @@
       //Private method for adding named HTML paragraph
       function add_vers(arr, pnum, lnum) {
 
-          $("#container" + pnum).append("<p id=\"pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + "\" style=\"text-indent: " + arr[0] + "em;\" class=\"vers\"></p>");
-          set_vers(String(arr[1]), pnum, lnum);
-          scroll_bottom("#container" + pnum);
+        $("#container" + pnum).append("<p id=\"pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + "\" style=\"text-indent: " + arr[0] + "em;\" class=\"vers\"></p>");
+
+        if (typeof _font_config !== "undefined") {
+            var elem = document.getElementById("pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum));
+            elem.style.fontFamily = _font_config[pnum-1].family;
+            elem.style.fontStyle = _font_config[pnum-1].style;
+            if (_font_config[pnum-1].pixels == 0) pxs = String(Math.floor(Math.random() * (_font_config[pnum-1].max_cfont - _font_config[pnum-1].min_cfont)) + _font_config[pnum-1].min_cfont) + 'px';
+            else pxs = String(_font_config[pnum-1].pixels) + 'px';
+            elem.style.fontSize = pxs;
+            elem.style.color = _font_config[pnum-1].color;
+        }
+
+        set_vers(String(arr[1]), pnum, lnum);
+        scroll_bottom("#container" + pnum);
       };
 
       //Private method for adding named text on canvas
@@ -872,7 +887,7 @@
           var clean_line = arr[1].replace(/_/g, " ");
           var ctx = document.getElementById('canvas' + pnum).getContext('2d');
 
-          if (_font_config[pnum-1].pixels == 0) pxs = String(Math.floor(Math.random() * (max_cfont - min_cfont)) + min_cfont) + 'px';
+          if (_font_config[pnum-1].pixels == 0) pxs = String(Math.floor(Math.random() * (_font_config[pnum-1].max_cfont - _font_config[pnum-1].min_cfont)) + _font_config[pnum-1].min_cfont) + 'px';
           else pxs = String(_font_config[pnum-1].pixels) + 'px';
           ctx.font = _font_config[pnum-1].style + " " + pxs + " " + _font_config[pnum-1].family;
 
@@ -1080,8 +1095,8 @@
                       fc.pixels = match[1];
                   else {
                       fc.pixels = 0;
-                      min_cfont = parseInt(match[1]);
-                      max_cfont = parseInt(match[2]);
+                      fc.min_cfont = parseInt(match[1]);
+                      fc.max_cfont = parseInt(match[2]);
                   }
               }
           } else fc.pixels = 16;

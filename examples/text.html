@@ -12,14 +12,18 @@
     <script type="text/javascript" src="../Poemario.js"></script>
 
     <script type="text/javascript">
-      var pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 100, ["poem1.xml", "poem2.xml"], 0, false, "config");
+      var pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 100, ["poem1.xml", "poem2.xml"], 0, false, "config",
+        [{family: "times, sans-serif", pixels: "22-26", style: "italic", color: "blue"},
+        {family: "times, sans-serif", pixels: "12-18", style: "normal", color: "green"}]);
       function switch_poemario() {
+        var fc = [{family: "times, sans-serif", pixels: "12-18", style: "italic", color: "red"},
+          {family: "times, sans-serif", pixels: "22-26", style: "normal", color: "cyan"}];
         var combo = document.getElementById("whichone");
         pmr.all_stop();
         delete pmr;
         var str_tmp = combo.options[combo.selectedIndex].value;
         list_poems = str_tmp.replace(/ /g, '').split(',');
-        pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 50, list_poems, 0, true, "config");
+        pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ALL, TYPE_LINE, 800, 50, list_poems, 0, true, "config", fc.slice(0, list_poems.length));
         pmr.txt_start();
       }
 
