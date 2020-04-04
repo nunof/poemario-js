@@ -65,7 +65,8 @@
   	>1 => char at a time
 
     * poem_speed (default=100):
-  	frequency in milisenconds for generating new verses
+    frequency in milisenconds for generating new verses. There is a special case meaning interactive-mode when
+      first three parameters are POEM_STATIC | FLOW_STATIC_ONE | TYPE_LINE
 
     * type_speed (default=100):
   	type writer speed in milisenconds
