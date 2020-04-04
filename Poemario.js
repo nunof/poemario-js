@@ -573,9 +573,23 @@
                   });
 
                   //update live
+                  //TODO - need to use jquery onclick and pass parameters when in add_verse
                   for (var i = 0; i < poem.length; i++) {
                       live[pnum][i][0] = count_initial_spaces(poem[i][0]);
                       live[pnum][i][1] = poem[i][0];
+                      if (_poem_speed == 0) {
+                        o = poem[i][1];
+                        v = live[pnum][i][1].split(' ');
+                        for (j = 0; j < o.length; j++) {
+                            w = parseInt(o[j] - 1);
+                            _tmp = v[w];
+                            v[w] = '<a href="#" data-poem=' + encodeURIComponent(JSON.stringify(poem)) + 
+                                ' data-t1= ' + id_timer1 + 
+                                ' data-t2= ' + id_timer2 + 
+                                '">' + _tmp + '</a>';
+                        }
+                        live[pnum][i][1] = v.join(' ');
+                      }
                   }
 
                   if (reset) {
@@ -587,15 +601,19 @@
                       window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
                       if (_first_mode != POEM_STATIC) {
                           for (var i = 0; i < live[pnum].length; i++) {
-                              _type_mode == TYPE_CONSTELLATION ? add_vers_canvas(new Array(live[pnum][i][0], " "), pnum, i) : add_vers(new Array(live[pnum][i][0], " "), pnum, i);
+                              _type_mode == TYPE_CONSTELLATION ? 
+                                add_vers_canvas(new Array(live[pnum][i][0], " "), pnum, i) : 
+                                add_vers(new Array(live[pnum][i][0], " "), pnum, i);
                           }
                           //start poem animation
                           first_poem(poem, pnum, 0, 0, id_timer1, id_timer2);
                       } else {
                           for (var i = 0; i < live[pnum].length; i++) {
-                              _type_mode == TYPE_CONSTELLATION ? add_vers_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i) : add_vers(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i);
+                            _type_mode == TYPE_CONSTELLATION ?
+                                add_vers_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i) :
+                                add_vers(live[pnum][i], pnum, i);
                           }
-                          timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
+                          if (_poem_speed > 0) timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
                       }
                   } else {
                       timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
@@ -706,24 +724,24 @@
           //FIRST PHASE, work the lists
           //static length poem, replace on vers each time
           if (_flow_mode == FLOW_STATIC_ONE) {
-              //process random vers
-              i = Math.floor(Math.random() * live[pnum].length)
-              var empty_space = count_initial_spaces(poem[i][0]);
-              var words = poem[i][0].trim().split(" ");
-              var orders = poem[i][1].split(",");
-              var taxons = poem[i][2].split(",");
-              live[pnum][i][0] = empty_space;
+            //process vers - NOTE - typing_pos is overloaded: it is an object when in interactive mode
+            i = _poem_speed > 0 ? Math.floor(Math.random() * live[pnum].length) : typing_pos.lnum;
+            var empty_space = count_initial_spaces(poem[i][0]);
+            var words = poem[i][0].trim().split(" ");
+            var orders = poem[i][1].split(",");
+            var taxons = poem[i][2].split(",");
+            live[pnum][i][0] = empty_space;
 
-              //process random word
-              var j = Math.floor(Math.random() * orders.length);
-              var taxons_list = window[taxons[j]];
-              if (orders[0].length > 0 && taxons[0].length > 0) {
-                  words[orders[j] - 1] = taxons_list[Math.floor(Math.random() * taxons_list.length)];
-                  live[pnum][i][1] = words.join(" ");
-              } else live[pnum][i][1] = poem[i][0];
+            //process word
+            var j = _poem_speed > 0 ? Math.floor(Math.random() * orders.length) : typing_pos.wnum;
+            var taxons_list = window[taxons[j]];
+            if (orders[0].length > 0 && taxons[0].length > 0) {
+                var new_word = words[orders[j] - 1] = taxons_list[Math.floor(Math.random() * taxons_list.length)];
+                live[pnum][i][1] = words.join(" ");
+            } else live[pnum][i][1] = poem[i][0];
 
           }
-          //dynamic length poem, add one poem instance each time
+          //dynamic length or static_all poem, add one poem instance each time
           else {
               for (i = 0; i < poem.length; i++) {
                   var empty_space = count_initial_spaces(poem[i][0]);
@@ -756,10 +774,13 @@
           }
           //static length poem, vers by vers
           else if ((_flow_mode == FLOW_STATIC_ONE || _flow_mode == FLOW_STATIC_ALL) && _type_mode == TYPE_LINE) {
-              set_vers(live[pnum][i][1], pnum, i);
-              timers[id_timer1] = setTimeout(function () {
-                  main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
-              }, _poem_speed);
+              if (_poem_speed > 0) {
+                set_vers(live[pnum][i][1], pnum, i);                  
+                timers[id_timer1] = setTimeout(function () {
+                    main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
+                }, _poem_speed);
+              }
+              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(new_word);
           }
           //dynamic length poem, vers by vers
           else if (_flow_mode == FLOW_GROWING && _type_mode == TYPE_LINE) {
@@ -842,10 +863,38 @@
           }
       };
 
+      //Private tmp
+      function change_word() {
+          this_id = $(this).attr('id').split('-');
+          jsn_poem = decodeURIComponent($(this).attr('data-poem'));
+          poem = JSON.parse(jsn_poem);
+          t1 = parseInt($(this).attr('data-t1'));
+          t2 = parseInt($(this).attr('data-t2'));
+          word_pos = {bc: this_id[2], lnum: this_id[3], wnum: this_id[4]};
+          
+          main_task(poem, this_id[1], word_pos, t1, t2);
+      }
+
+      //Private method for adding anchors to paragraph when in interactive mode
+      function add_anchors(line, pnum, lnum) {
+        $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).html(line);
+        var id_counter = 0;
+        $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + " a").each(function(){   
+            tmp = $(this).text();
+            clean_line = tmp.replace(/_/g, " ");
+            $(this).text(clean_line);
+            $(this).attr('id', 'wo-' + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + '-' + String(id_counter));
+            $(this).click(change_word);
+            //dp = $(this).attr('data-poem');
+            //console.log('data-poem is ' + dp);
+            id_counter++;
+        });
+      }
+
       //Private method for changing contents of named HTML paragraph
       function set_vers(line, pnum, lnum) {
 
-          if (line.length > 0) {
+        if (line.length > 0) {
               //show aggregated words as individual words
               var clean_line = line.replace(/_/g, " ");
               $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).text(clean_line);
@@ -878,7 +927,8 @@
             elem.style.color = _font_config[pnum-1].color;
         }
 
-        set_vers(String(arr[1]), pnum, lnum);
+        if (_poem_speed == 0) add_anchors(String(arr[1]), pnum, lnum);
+        else set_vers(String(arr[1]), pnum, lnum);
         scroll_bottom("#container" + pnum);
       };
 

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"></meta>
+    <meta name="robots" content="NOODP,NOYDIR"></meta>
+
+    <title>Poemario js library</title>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript" src="../Poemario.js"></script>
+
+    <script type="text/javascript">
+      var pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ONE, TYPE_LINE, 0, 100, ["poem1.xml", "poem2.xml"], 0, false, "config",
+        [{family: "times, sans-serif", pixels: "22-26", style: "italic", color: "blue"},
+        {family: "times, sans-serif", pixels: "12-18", style: "normal", color: "green"}]);
+      function switch_poemario() {
+        var fc = [{family: "times, sans-serif", pixels: "12-18", style: "italic", color: "red"},
+          {family: "times, sans-serif", pixels: "22-26", style: "normal", color: "cyan"}];
+        var combo = document.getElementById("whichone");
+        pmr.all_stop();
+        delete pmr;
+        var str_tmp = combo.options[combo.selectedIndex].value;
+        list_poems = str_tmp.replace(/ /g, '').split(',');
+        pmr = new Poemario(POEM_TYPED, FLOW_STATIC_ONE, TYPE_LINE, 0, 50, list_poems, 0, true, "config", fc.slice(0, list_poems.length));
+        pmr.txt_start();
+      }
+
+      function post_text(pnum) {
+        var author = prompt("You are about to post to Poemario blog, what's your name?", "Harry Potter");
+
+        if (author != null) {
+          pmr.text_wp(1, author);
+          $("#msgconfirmation").dialog("open");
+        } 
+      }
+
+      $(document).ready(function(){
+        $("#msgconfirmation").dialog({ autoOpen: false });
+
+      });
+    </script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">        
+</head>
+
+<body id="body" onload="pmr.txt_start();">
+  <div id="floatingbtns" style="position:absolute;top:1em;right: 1em;width:480px;height:400px;z-index:10">
+      <select id="whichone" onchange="switch_poemario()" autocomplete="off">
+        <option value="poem1.xml">1 poem</option>
+        <option value="poem1.xml, poem2.xml" selected>2 poems</option>
+    </select>
+      <BR></BR>
+      <button type="button" onclick="pmr.txt_stop_graceful();">stop_graceful</button>
+      <button type="button" onclick="pmr.txt_stop_stateful();">stop_stateful</button>
+      <button type="button" onclick="pmr.txt_resume();">resume</button>
+      <button type="button" onclick="pmr.txt_reset();">reset</button>
+      <button type="button" onclick="document.getElementById('bottom-right').innerHTML = 
+        'poem1 max is ' + pmr.get_num_max_poems(1) + '<br>' + 'poem2 max is ' + pmr.get_num_max_poems(2);">get num max poems</button>
+      <BR></BR>
+      <label for="pspeed">Poem speed</label>
+      <input type="range" id="pspeed" name="pspeed" min="-600" max="-20" value="-400" onchange="pmr.poem_speed=this.value*-1;"></input>
+      <BR></BR>
+      <label for="tspeed">Type speed</label>
+      <input type="range" id="tspeed" name="tspeed" min="-600" max="-20" value="-50" onchange="pmr.type_speed=this.value*-1;"></input>
+      <BR></BR>
+      <button type="button" onclick="pmr.audio_start(2000);">start audio (2secs frequency)</button>
+      <button type="button" onclick="pmr.audio_stop();">stop audio (now)</button>
+      <button type="button" onclick="pmr.audio_stop(false);">stop audio (after current sounds)</button>
+      <button type="button" onclick="pmr.audio_resume();">resume audio (accordingly)</button>
+      <button type="button" onclick="post_text(1)">post text from poem 1 to WP</button>
+      <div id="bottom-right" style="position:absolute;top:8px;right:16px;z-index:10;color:yellowgreen"></div>
+  </div>
+  <div id="msgconfirmation" title="Posted to Poemario">
+    <p>Arigato! You should be able to see your poem <a href="https://telepoesis.net/poemario" target="_blank">here</a></p>
+  </div>
+  <p id="output" style="font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; font-size:small"></p>
+
+</body>
+
+</html>
