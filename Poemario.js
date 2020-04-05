@@ -50,23 +50,23 @@
   Poemario constructor parameters:
 
     * first_mode (default=1):
-  	1  => static poem
-  	!1 => typed poem
+  	1  => static poem - starts complete
+  	!1 => typed poem - starts blank
 
     * flow_mode (default=2):
   	1 => static length poem, each time replacing one word in one vers
-  	2 => growing length_poem
+  	2 => growing length_poem, adding verses ad infinitum
     3 => static length poem, each time replacing all words in one vers
     # TODO: static length poem, each time replacing all words in all verses
 
     * type_mode (default=2):
     0  => text as graphics on 2d canvas
-  	1  => line at a time
-  	>1 => char at a time
+  	1  => line at a time - a line is replaced in one go
+  	>1 => char at a time - a line is typed one char at a time
 
     * poem_speed (default=100):
-    frequency in milisenconds for generating new verses. There is a special case meaning interactive-mode when
-      first three parameters are POEM_STATIC | FLOW_STATIC_ONE | TYPE_LINE
+    frequency in milisenconds for generating new verses. 
+    If first three parameters are POEM_STATIC | FLOW_STATIC_ONE | TYPE_LINE, then a poem_speed = 0 means interactive-mode  
 
     * type_speed (default=100):
   	type writer speed in milisenconds
@@ -83,8 +83,9 @@
     * sounds_origin (default=(empty)):
   	if string, then use dir with index files; if supressed, then it uses XML; only matters is has_audio is true.
 
-    * font_config (default = {family: 'arial, sans-serif', pixels: 16, style\: 'normal', alpha: 1})
-    javascript object that defines font following font properties
+    * font_config (default = {family: 'arial, sans-serif', pixels: 16, style: 'normal', alpha: 1})
+    It can be a single object that applies to all poems or a list of objects of equal length to list_poems to have a font config per object
+    The javascript object that defines font following font properties
       - family => <font name, generic family name> (font name is intended font, family name is there to let browser choose similar based on family)
         fonts are names such as times, courier, arial, etc
         family names are one of serif, sans-serif, cursive, fantasy or monospace
@@ -578,16 +579,16 @@
                   for (var i = 0; i < poem.length; i++) {
                       live[pnum][i][0] = count_initial_spaces(poem[i][0]);
                       live[pnum][i][1] = poem[i][0];
-                      if (_poem_speed == 0) {
-                        o = poem[i][1];
-                        v = live[pnum][i][1].split(' ');
+                      if (_poem_speed == 0 && _first_mode == POEM_STATIC) {
+                        var o = poem[i][1].split(',');
+                        var v = live[pnum][i][1].split(' ');
                         for (j = 0; j < o.length; j++) {
                             w = parseInt(o[j] - 1);
-                            _tmp = v[w];
+                            _w = v[w];
                             v[w] = '<a href="#" data-poem=' + encodeURIComponent(JSON.stringify(poem)) + 
                                 ' data-t1= ' + id_timer1 + 
                                 ' data-t2= ' + id_timer2 + 
-                                '">' + _tmp + '</a>';
+                                '">' + _w + '</a>';
                         }
                         live[pnum][i][1] = v.join(' ');
                       }
@@ -614,7 +615,8 @@
                                 add_vers_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i) :
                                 add_vers(live[pnum][i], pnum, i);
                           }
-                          if (_poem_speed > 0) timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
+                          if (_poem_speed > 0 || _first_mode != POEM_STATIC) 
+                            timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
                       }
                   } else {
                       timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
@@ -726,7 +728,7 @@
           //static length poem, replace on vers each time
           if (_flow_mode == FLOW_STATIC_ONE) {
             //process vers - NOTE - typing_pos is overloaded: it is an object when in interactive mode
-            i = _poem_speed > 0 ? Math.floor(Math.random() * live[pnum].length) : typing_pos.lnum;
+            i = (_poem_speed > 0 || _first_mode != POEM_STATIC) ? Math.floor(Math.random() * live[pnum].length) : typing_pos.lnum;
             var empty_space = count_initial_spaces(poem[i][0]);
             var words = poem[i][0].trim().split(" ");
             var orders = poem[i][1].split(",");
@@ -734,7 +736,7 @@
             live[pnum][i][0] = empty_space;
 
             //process word
-            var j = _poem_speed > 0 ? Math.floor(Math.random() * orders.length) : typing_pos.wnum;
+            var j = (_poem_speed > 0 || _first_mode != POEM_STATIC) ? Math.floor(Math.random() * orders.length) : typing_pos.wnum;
             var taxons_list = window[taxons[j]];
             if (orders[0].length > 0 && taxons[0].length > 0) {
                 var new_word = words[orders[j] - 1] = taxons_list[Math.floor(Math.random() * taxons_list.length)];
@@ -775,7 +777,7 @@
           }
           //static length poem, vers by vers
           else if ((_flow_mode == FLOW_STATIC_ONE || _flow_mode == FLOW_STATIC_ALL) && _type_mode == TYPE_LINE) {
-              if (_poem_speed > 0) {
+              if (_poem_speed > 0 || _first_mode != POEM_STATIC) {
                 set_vers(live[pnum][i][1], pnum, i);                  
                 timers[id_timer1] = setTimeout(function () {
                     main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
@@ -872,7 +874,7 @@
           t1 = parseInt($(this).attr('data-t1'));
           t2 = parseInt($(this).attr('data-t2'));
           word_pos = {bc: this_id[2], lnum: this_id[3], wnum: this_id[4]};
-          
+
           main_task(poem, this_id[1], word_pos, t1, t2);
       }
 
@@ -928,7 +930,7 @@
             elem.style.color = _font_config[pnum-1].color;
         }
 
-        if (_poem_speed == 0) add_anchors(String(arr[1]), pnum, lnum);
+        if (_poem_speed == 0 && _first_mode == POEM_STATIC) add_anchors(String(arr[1]), pnum, lnum);
         else set_vers(String(arr[1]), pnum, lnum);
         scroll_bottom("#container" + pnum);
       };

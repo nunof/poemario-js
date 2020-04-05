@@ -23,7 +23,7 @@
         delete pmr;
         var str_tmp = combo.options[combo.selectedIndex].value;
         list_poems = str_tmp.replace(/ /g, '').split(',');
-        pmr = new Poemario(POEM_TYPED, FLOW_STATIC_ONE, TYPE_LINE, 0, 50, list_poems, 0, true, "config", fc.slice(0, list_poems.length));
+        pmr = new Poemario(POEM_STATIC, FLOW_STATIC_ONE, TYPE_LINE, 0, 50, list_poems, 0, false, "config", fc.slice(0, list_poems.length));
         pmr.txt_start();
       }
 
