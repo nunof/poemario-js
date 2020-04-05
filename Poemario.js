@@ -446,7 +446,8 @@
               for (var i = 0; i < live[pnum].length; i++) {
                   ptxt += live[pnum][i][1] + "\n";
               }
-              var clean_txt = ptxt.replace(/_/g, " ");              
+              var txt = remove_html(ptxt);
+              var clean_txt = txt.replace(/_/g, " ");              
 
               var wp_req = new XMLHttpRequest();
               wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
@@ -500,7 +501,8 @@
                   //fd.append("txt", encodeURIComponent(ptxt));
                   //fd.append("img", obj_canvas.toDataURL("image/png"));
                   //wp_req.send(fd);
-                  var clean_txt = ptxt.replace(/_/g, " ");
+                  var txt = remove_html(ptxt);
+                  var clean_txt = txt.replace(/_/g, " ");
                   wp_req.send('txt=' + encodeURIComponent(clean_txt) + '&img=' + encodeURIComponent(obj_canvas.toDataURL("image/png")));
                   if (DEBUG) console.log("WP: posted");
               };
@@ -1200,4 +1202,11 @@
           cache = null;
           return _tmp;
       }
+
+      // Private function to remove html tags from var
+      function remove_html(html) {
+        if ((html === null) || (html === '')) return '';
+        else text = html.toString();
+        return text.replace( /(<([^>]+)>)/ig, '');
+     }
   };
