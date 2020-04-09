@@ -29,6 +29,7 @@ if (defined($poem) && length($poem) > 0) {
 	my $wp_obj = WordPress->new($wp_server, $wp_user, $wp_pass);
 	my @categories = @{ $wp_obj->get_categories };
 	#print map { "$_\n" } @categories;
+	my $w = $wpdir;
 	$wpdir = "Poemas" unless (grep { $_ eq $w} @categories);
 	my $rand_title = &get_rand_title($poem);
 	$wp_obj->post("$rand_title, por $poem_user", $poem, [$wpdir]);
@@ -85,7 +86,7 @@ sub getcgivars {
 
     $poem = $main_param;
     $poem_user = uri_unescape(param("poem_user"));
-    $wpdir = uri_unescape(param("wpdir"));
+    $wpdir = uri_unescape(param("wp_dir"));
 	return 1;
 }
 
