@@ -437,7 +437,7 @@
       }
 
       // Public method to post to local WP - the instantaneous poem text
-      Poemario.prototype.text_wp = function (pnum, poem_user) {
+      Poemario.prototype.text_wp = function (pnum, poem_user, wp_dir) {
           if (_type_mode != TYPE_CONSTELLATION) {
               if (typeof pnum === 'undefined') pnum = 1;
               if (DEBUG) console.log("WP: text post called for pnum " + pnum);
@@ -454,13 +454,14 @@
               wp_req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
               var params = 'poem=' + encodeURIComponent(clean_txt);
               if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
+              if (typeof wp_dir !== 'undefined') params += "&wp_dir=" + encodeURIComponent(wp_dir);
               wp_req.send(params);
               if (DEBUG) console.log("WP: posted");
           }
       };
 
       // Public method to post to local WP - the instantaneous poem with the associated image
-      Poemario.prototype.image_wp = function (pnum) {
+      Poemario.prototype.image_wp = function (pnum, poem_user, wp_dir) {
           if (_type_mode == TYPE_CONSTELLATION) {
 
               if (typeof pnum === 'undefined') pnum = 1;
@@ -475,8 +476,7 @@
               wp_req.open("POST", "/cgi-bin/wp_image.pl", true);
 
               wp_req.onload = function (obj_event) {
-                  //console.log("inside 2");
-                  // uploaded.
+                  if (DEBUG) console.log("WP: request connection established");
               };
 
               wp_req.onreadystatechange = function () { // Call a function when the state changes.
@@ -503,7 +503,10 @@
                   //wp_req.send(fd);
                   var txt = remove_html(ptxt);
                   var clean_txt = txt.replace(/_/g, " ");
-                  wp_req.send('txt=' + encodeURIComponent(clean_txt) + '&img=' + encodeURIComponent(obj_canvas.toDataURL("image/png")));
+                  var params = 'txt=' + encodeURIComponent(clean_txt);
+                  if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
+                  if (typeof wp_dir !== 'undefined') params += "&wp_dir=" + encodeURIComponent(wp_dir);
+                  wp_req.send(params + '&img=' + encodeURIComponent(obj_canvas.toDataURL("image/png")));
                   if (DEBUG) console.log("WP: posted");
               };
 

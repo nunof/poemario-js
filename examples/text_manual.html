@@ -31,7 +31,7 @@
         var author = prompt("You are about to post to Poemario blog, what's your name?", "Harry Potter");
 
         if (author != null) {
-          pmr.text_wp(1, author);
+          pmr.text_wp(1, author, 'wrong-txt-dir');
           $("#msgconfirmation").dialog("open");
         } 
       }
@@ -74,7 +74,7 @@
   <div id="msgconfirmation" title="Posted to Poemario">
     <p>Arigato! You should be able to see your poem <a href="https://telepoesis.net/poemario" target="_blank">here</a></p>
   </div>
-  <p id="output" style="font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; font-size:small"></p>
+  <!--<p id="output" style="font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace; font-size:small"></p>-->
 
 </body>
 

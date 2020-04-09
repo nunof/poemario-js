@@ -7,6 +7,7 @@ use XMLRPC::Lite;
 use IO::Socket::SSL;
 use MIME::Base64 ();
 use URI::Escape;
+use Data::Dumper;
 
 my ($buf,$contents);
 my $pictureid;
@@ -30,6 +31,7 @@ my %cgivars= &getcgivars();
 #exit;
 
 my $publishdate = time;
+my $wpdir = use_category($cgivars{'wpd'}, $password);
 
 my $res = XMLRPC::Lite
 ->proxy($server)
@@ -41,63 +43,58 @@ if (defined ($res)) {
 	$pictureid = $res->{id};
 	$pictureurl = $res->{url};
 	print ". picture uploaded with id $pictureid\n";
-} else {
-        print " .. uploading picture failed: $!";
+} 
+else {
+	print " .. uploading picture failed: $!";
 }
 
 my $res = XMLRPC::Lite
 ->proxy($server)
 ->call('wp.newPost', 1, $username, $password,
 {
-		post_status  => "publish",
-		post_content => "$cgivars{'txt'}\n\nfull image in $pictureurl",
-    post_title => "poemario img $publishdate",
+	post_status  => "publish",
+	post_content => "$cgivars{'txt'}\n\nfull image in $pictureurl",
+    post_title => "poemario img $publishdate\n\npor $cgivars{'pu'}",
     #custom_fields => [
 		#	{ "key" => "_thumbnail_id", "value" => $pictureid },
 		#	{ "key" => "_thumbnail_url", "value" => $pictureurl }
 		#]
-		post_thumbnail => $pictureid
-  }, 1)->result;
+	post_thumbnail => $pictureid,
+    categories  => ($wpdir)
+}, 1)->result;
 
 if (defined ($res)) {
-		#my $res2 = XMLRPC::Lite
-		#->proxy($server)
-		#->call('metaWeblog.editPost', $res, $username, $password,
-		#{
-	  #       post_status  => "publish",
-    #       mt_keywords => "poemario",
-						#custom_fields => [ { "key" => "_thumbnail_id", "value" => $pictureid } ]
-		#				wp_post_thumbnail => $pictureid
-		#}, 1)->result;
-
-		#if (defined ($res2)) {
-    #	print ". posted id $res and edited article id $res2 to picture id $pictureid\n";
-		#}
-		#else { ". posted id $res but failed to edit article id $res2 to picture id $pictureid\n"; }
-		print ". posted id $res to picture id $pictureid\n";
-} else {
-        print ".. posting article with id $res failed: $!";
+	print ". posted id $res to picture id $pictureid\n";
+} 
+else {
+	print ".. posting article with id $res failed: $!";
 }
 
 sub getcgivars {
 
 	my %in = ();
 	my $req_method = $ENV{'REQUEST_METHOD'};
-	return %in unless($req_method eq 'POST');
-  my @params = param();
-  my $pn = "";
-  foreach $pn ( @params ) { print "$pn \n"; }
+	#return %in unless($req_method eq 'POST');
+  	my @params = param();
+  	my $pn = "";
+  	foreach $pn ( @params ) { print "$pn \n"; }
 
 	my $pimg = uri_unescape(param("img"));
 	my $ptxt = uri_unescape(param("txt"));
+	my $pu = uri_unescape(param("poem_user"));
+	my $wpd = uri_unescape(param("wp_dir"));
 
 	return () unless (defined($ptxt) && length($ptxt) > 0);
 	return () unless (defined($pimg) && length($pimg) > 0);
+	$pu = "anon" unless (defined($pu) && length($pu) > 0);
+	$wpd = "Poemas" unless (defined($wpd) && length($wpd) > 0);
 
-  my $just_img = substr $pimg, 22;
+  	my $just_img = substr $pimg, 22;
 	$in{"image_enc"} = $just_img;
-  $in{"image_dec"} = MIME::Base64::decode_base64($just_img);
+  	$in{"image_dec"} = MIME::Base64::decode_base64($just_img);
 	$in{"txt"} = $ptxt;
+	$in{"pu"} = $pu;
+	$in{"wpd"} = $wpd;
 
 	return %in;
 }
@@ -111,4 +108,29 @@ sub getpasswd {
     }
     close($fh);
 	return $content;
+}
+
+sub use_category {
+	my ($cat, $pwd) = @_;
+	my $wpdir;
+
+	my $res = XMLRPC::Lite
+	->proxy($server)
+	->call('metaWeblog.getCategories', 1, 'perl', $pwd)
+	->result;
+
+	if (defined ($res)) {
+		#my $call = $self->{ server }->call('metaWeblog.getCategories', 1, 'perl', $pwd);
+		#$call->fault and croak 'get_categories: ', $call->faultstring;
+		my @categories;
+		push @categories, $_->{ categoryName } for @{$res};
+		#print map { "$_\n" } @categories;
+		$wpdir = $cat;
+		$wpdir = "Poemas" unless (grep { $_ eq $cat} @categories);
+	}
+	else {
+		$wpdir = 'Poemas';
+	}
+
+    return $wpdir;
 }

@@ -34,8 +34,8 @@ if (defined($poem) && length($poem) > 0) {
 	$wp_obj->post("$rand_title, por $poem_user", $poem, [$wpdir]);
 }
 
-sub log_request()
-{
+sub log_request() {
+	
 	my ($a, $b, $c) = @_;
 	my $date_time = localtime();
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime();
