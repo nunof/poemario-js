@@ -1,6 +1,7 @@
 <poema created='1222717076'>  
     <texto verso='Sim o fogo é luz em presença da noite ?' ordem='3,5,9' taxon='subs_m_s,subs_m_s,subs_f_s'/>  
     <texto verso='Para respostas directas , perguntas assobiadas' ordem='2,3,5,6' taxon='subs_f_p,adjs_f_p,subs_f_p,adjs_f_p'/> 
+	<texto verso='' ordem='' taxon=''/> 
     <texto verso='Cala , saberás viver' ordem='1,4' taxon='verbos_pr,verbos_inf'/> 
     <categorias>
 	<subs_m_s>

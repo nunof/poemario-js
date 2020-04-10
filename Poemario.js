@@ -580,7 +580,7 @@
                   });
 
                   //update live
-                  //TODO - need to use jquery onclick and pass parameters when in add_verse
+                  //TODO - need to use jquery onclick and pass parameters when in add_versee
                   for (var i = 0; i < poem.length; i++) {
                       live[pnum][i][0] = count_initial_spaces(poem[i][0]);
                       live[pnum][i][1] = poem[i][0];
@@ -609,16 +609,16 @@
                       if (_first_mode != POEM_STATIC) {
                           for (var i = 0; i < live[pnum].length; i++) {
                               _type_mode == TYPE_CONSTELLATION ? 
-                                add_vers_canvas(new Array(live[pnum][i][0], " "), pnum, i) : 
-                                add_vers(new Array(live[pnum][i][0], " "), pnum, i);
+                                add_verse_canvas(new Array(live[pnum][i][0], " "), pnum, i) : 
+                                add_verse(new Array(live[pnum][i][0], " "), pnum, i);
                           }
                           //start poem animation
                           first_poem(poem, pnum, 0, 0, id_timer1, id_timer2);
                       } else {
                           for (var i = 0; i < live[pnum].length; i++) {
                             _type_mode == TYPE_CONSTELLATION ?
-                                add_vers_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i) :
-                                add_vers(live[pnum][i], pnum, i);
+                                add_verse_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i) :
+                                add_verse(live[pnum][i], pnum, i);
                           }
                           if (_poem_speed > 0 || _first_mode != POEM_STATIC) 
                             timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
@@ -666,14 +666,14 @@
               case TYPE_CONSTELLATION: //html canvas
                   if (lnum >= live[pnum].length - 1) {
                       clearTimeout(timers[id_timer2]);
-                      add_vers_canvas(live[pnum][lnum], pnum, lnum);
+                      add_verse_canvas(live[pnum][lnum], pnum, lnum);
                       timers[id_timer1] = setTimeout(function () {
                           main_task(poem, pnum, 0, id_timer1, id_timer2)
                       }, _poem_speed);
                   }
                   //not last vers
                   else {
-                      add_vers_canvas(live[pnum][lnum], pnum, lnum);
+                      add_verse_canvas(live[pnum][lnum], pnum, lnum);
                       timers[id_timer2] = setTimeout(function () {
                           first_poem(poem, pnum, lnum + 1, typing_pos, id_timer1, id_timer2)
                       }, _poem_speed);
@@ -683,16 +683,16 @@
                   //if last vers
                   if (lnum >= live[pnum].length - 1) {
                       clearTimeout(timers[id_timer2]);
-                      if (_flow_mode == FLOW_STATIC_ONE) set_vers(live[pnum][lnum][1], pnum, lnum);
-                      else add_vers(live[pnum][lnum], pnum, lnum);
+                      if (_flow_mode == FLOW_STATIC_ONE) set_verse_txt(live[pnum][lnum][1], pnum, lnum);
+                      else add_verse(live[pnum][lnum], pnum, lnum);
                       timers[id_timer1] = setTimeout(function () {
                           main_task(poem, pnum, 0, id_timer1, id_timer2)
                       }, _poem_speed);
                   }
                   //not last vers
                   else {
-                      if (_flow_mode == FLOW_STATIC_ONE) set_vers(live[pnum][lnum][1], pnum, lnum);
-                      else add_vers(live[pnum][lnum], pnum, lnum);
+                      if (_flow_mode == FLOW_STATIC_ONE) set_verse_txt(live[pnum][lnum][1], pnum, lnum);
+                      else add_verse(live[pnum][lnum], pnum, lnum);
                       timers[id_timer2] = setTimeout(function () {
                           first_poem(poem, pnum, lnum + 1, typing_pos, id_timer1, id_timer2)
                       }, _poem_speed);
@@ -775,7 +775,7 @@
           if (_type_mode == TYPE_CONSTELLATION) {
               window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
               i = Math.floor(Math.random() * live[pnum].length);
-              add_vers_canvas(live[pnum][i], pnum, i);
+              add_verse_canvas(live[pnum][i], pnum, i);
               timers[id_timer1] = setTimeout(function () {
                   main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
               }, _poem_speed);
@@ -783,7 +783,7 @@
           //static length poem, vers by vers
           else if ((_flow_mode == FLOW_STATIC_ONE || _flow_mode == FLOW_STATIC_ALL) && _type_mode == TYPE_LINE) {
               if (_poem_speed > 0 || _first_mode != POEM_STATIC) {
-                set_vers(live[pnum][i][1], pnum, i);                  
+                set_verse_txt(live[pnum][i][1], pnum, i);                  
                 timers[id_timer1] = setTimeout(function () {
                     main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
                 }, _poem_speed);
@@ -794,7 +794,7 @@
           else if (_flow_mode == FLOW_GROWING && _type_mode == TYPE_LINE) {
               window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
               for (i = 0; i < live[pnum].length; i++) {
-                  add_vers(live[pnum][i], pnum, i);
+                  add_verse(live[pnum][i], pnum, i);
               }
               timers[id_timer1] = setTimeout(function () {
                   main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
@@ -806,7 +806,7 @@
               typing_pos = 0;
               //static length poem
               if (_flow_mode == FLOW_STATIC_ONE || _flow_mode == FLOW_STATIC_ALL) {
-                  set_vers("", pnum, i);
+                  set_verse_txt("", pnum, i);
                   timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, i, typing_pos, id_timer1, id_timer2, false)
                   }, _type_speed);
@@ -815,7 +815,7 @@
               else {
                   window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
                   for (i = 0; i < live[pnum].length; i++) {
-                      add_vers(new Array(live[pnum][i][0], " "), pnum, i);
+                      add_verse(new Array(live[pnum][i][0], " "), pnum, i);
                   }
                   timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, 0, typing_pos, id_timer1, id_timer2, false)
@@ -842,13 +842,13 @@
           if ((lnum >= live[pnum].length - 1 && typing_pos > live[pnum][lnum][1].length) || (typing_pos > live[pnum][lnum][1].length && _flow_mode == FLOW_STATIC_ONE)) {
               //if first_poem we always print it whole
               if (is_initial && lnum < live[pnum].length - 1) {
-                  if (live[pnum][lnum][1].length == 0) set_vers("", pnum, lnum);
+                  if (live[pnum][lnum][1].length == 0) set_verse_txt("", pnum, lnum);
                   timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, lnum + 1, 0, id_timer1, id_timer2, is_initial)
                   }, _poem_speed);
               } else {
                   clearTimeout(timers[id_timer2]);
-                  set_vers(partial, pnum, lnum);
+                  set_verse_txt(partial, pnum, lnum);
                   timers[id_timer1] = setTimeout(function () {
                       main_task(poem, pnum, 0, id_timer1, id_timer2)
                   }, _poem_speed);
@@ -856,14 +856,14 @@
           } else {
               //we are still in the middle of a vers
               if (typing_pos <= live[pnum][lnum][1].length) {
-                  set_vers(partial, pnum, lnum);
+                  set_verse_txt(partial, pnum, lnum);
                   timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, lnum, typing_pos, id_timer1, id_timer2, is_initial)
                   }, _type_speed);
               }
               //we are going to start a new vers
               else {
-                  if (live[pnum][lnum][1].length == 0) set_vers("", pnum, lnum);
+                  if (live[pnum][lnum][1].length == 0) set_verse_txt("", pnum, lnum);
                   timers[id_timer2] = setTimeout(function () {
                       typing_task(poem, pnum, lnum + 1, 0, id_timer1, id_timer2, is_initial)
                   }, _type_speed);
@@ -884,7 +884,9 @@
       }
 
       //Private method for adding anchors to paragraph when in interactive mode
-      function add_anchors(line, pnum, lnum) {
+      function set_verse_html(line, pnum, lnum) {
+
+        if (line.length === 0) line = "<BR>";
         $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).html(line);
         var id_counter = 0;
         $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + " a").each(function(){   
@@ -900,7 +902,7 @@
       }
 
       //Private method for changing contents of named HTML paragraph
-      function set_vers(line, pnum, lnum) {
+      function set_verse_txt(line, pnum, lnum) {
 
         if (line.length > 0) {
               //show aggregated words as individual words
@@ -915,13 +917,13 @@
       };
 
       //Private method for changing contents of named text on canvas
-      function set_vers_canvas(line, pnum, lnum) {
+      function set_verse_canvas(line, pnum, lnum) {
           //Probably won't be used
       };
 
 
       //Private method for adding named HTML paragraph
-      function add_vers(arr, pnum, lnum) {
+      function add_verse(arr, pnum, lnum) {
 
         $("#container" + pnum).append("<p id=\"pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + "\" style=\"text-indent: " + arr[0] + "em;\" class=\"vers\"></p>");
 
@@ -935,13 +937,13 @@
             elem.style.color = _font_config[pnum-1].color;
         }
 
-        if (_poem_speed == 0 && _first_mode == POEM_STATIC) add_anchors(String(arr[1]), pnum, lnum);
-        else set_vers(String(arr[1]), pnum, lnum);
+        if (_poem_speed == 0 && _first_mode == POEM_STATIC) set_verse_html(String(arr[1]), pnum, lnum);
+        else set_verse_txt(String(arr[1]), pnum, lnum);
         scroll_bottom("#container" + pnum);
       };
 
       //Private method for adding named text on canvas
-      function add_vers_canvas(arr, pnum, lnum) {
+      function add_verse_canvas(arr, pnum, lnum) {
           var clean_line = arr[1].replace(/_/g, " ");
           var ctx = document.getElementById('canvas' + pnum).getContext('2d');
 
