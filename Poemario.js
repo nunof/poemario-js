@@ -447,7 +447,7 @@
                   ptxt += live[pnum][i][1] + "\n";
               }
               var txt = remove_html(ptxt);
-              var clean_txt = txt.replace(/_/g, " ");              
+              var clean_txt = txt.replace(/_/g, " ");
 
               var wp_req = new XMLHttpRequest();
               wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
@@ -735,7 +735,7 @@
             //process vers - NOTE - typing_pos is overloaded: it is an object when in interactive mode
             i = (_poem_speed > 0 || _first_mode != POEM_STATIC) ? Math.floor(Math.random() * live[pnum].length) : typing_pos.lnum;
             var empty_space = count_initial_spaces(poem[i][0]);
-            var words = poem[i][0].trim().split(" ");
+            var words = live[pnum][i][1].trim().split(" ");
             var orders = poem[i][1].split(",");
             var taxons = poem[i][2].split(",");
             live[pnum][i][0] = empty_space;
@@ -753,7 +753,7 @@
           else {
               for (i = 0; i < poem.length; i++) {
                   var empty_space = count_initial_spaces(poem[i][0]);
-                  var words = poem[i][0].trim().split(" ");
+                  var words = live[pnum][i][1].trim().split(" ");
                   var orders = poem[i][1].split(",");
                   var taxons = poem[i][2].split(",");
                   if (orders[0].trim().length > 0 && taxons[0].trim().length > 0) {
@@ -788,7 +788,7 @@
                     main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
                 }, _poem_speed);
               }
-              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(new_word);
+              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(remove_html(new_word).replace(/_/g, " "));
           }
           //dynamic length poem, vers by vers
           else if (_flow_mode == FLOW_GROWING && _type_mode == TYPE_LINE) {
@@ -885,7 +885,7 @@
 
       //Private method for adding anchors to paragraph when in interactive mode
       function set_verse_html(line, pnum, lnum) {
-
+console.log('line is ' + line);
         if (line.length === 0) line = "<BR>";
         $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).html(line);
         var id_counter = 0;
