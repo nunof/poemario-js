@@ -885,7 +885,7 @@
 
       //Private method for adding anchors to paragraph when in interactive mode
       function set_verse_html(line, pnum, lnum) {
-console.log('line is ' + line);
+
         if (line.length === 0) line = "<BR>";
         $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).html(line);
         var id_counter = 0;
