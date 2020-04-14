@@ -788,7 +788,7 @@
                     main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
                 }, _poem_speed);
               }
-              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(remove_html(new_word).replace(/_/g, " "));
+              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(remove_html(new_word).replace(/_/g, " ").trim());
           }
           //dynamic length poem, vers by vers
           else if (_flow_mode == FLOW_GROWING && _type_mode == TYPE_LINE) {
