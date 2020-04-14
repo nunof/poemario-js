@@ -446,8 +446,7 @@
               for (var i = 0; i < live[pnum].length; i++) {
                   ptxt += live[pnum][i][1] + "\n";
               }
-              var txt = remove_html(ptxt);
-              var clean_txt = txt.replace(/_/g, " ");
+              var clean_txt = ptxt.replace(/_/g, " ");
 
               var wp_req = new XMLHttpRequest();
               wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
@@ -501,8 +500,7 @@
                   //fd.append("txt", encodeURIComponent(ptxt));
                   //fd.append("img", obj_canvas.toDataURL("image/png"));
                   //wp_req.send(fd);
-                  var txt = remove_html(ptxt);
-                  var clean_txt = txt.replace(/_/g, " ");
+                  var clean_txt = ptxt.replace(/_/g, " ");
                   var params = 'txt=' + encodeURIComponent(clean_txt);
                   if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
                   if (typeof wp_dir !== 'undefined') params += "&wp_dir=" + encodeURIComponent(wp_dir);
@@ -616,9 +614,13 @@
                           first_poem(poem, pnum, 0, 0, id_timer1, id_timer2);
                       } else {
                           for (var i = 0; i < live[pnum].length; i++) {
-                            _type_mode == TYPE_CONSTELLATION ?
-                                add_verse_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i) :
+                            if (_type_mode == TYPE_CONSTELLATION)
+                                add_verse_canvas(new Array(live[pnum][i][0], live[pnum][i][1]), pnum, i);
+                            else {
                                 add_verse(live[pnum][i], pnum, i);
+                                //remove html elements from live poem, we dont need it anymore
+                                live[pnum][i][1] = remove_html(live[pnum][i][1]);
+                            }
                           }
                           if (_poem_speed > 0 || _first_mode != POEM_STATIC) 
                             timers[id_timer1] = setTimeout(main_task(poem, pnum, 0, id_timer1, id_timer2), _poem_speed);
@@ -788,7 +790,7 @@
                     main_task(poem, pnum, typing_pos, id_timer1, id_timer2)
                 }, _poem_speed);
               }
-              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(remove_html(new_word).replace(/_/g, " ").trim());
+              else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(new_word.replace(/_/g, " ").trim());
           }
           //dynamic length poem, vers by vers
           else if (_flow_mode == FLOW_GROWING && _type_mode == TYPE_LINE) {
@@ -1212,6 +1214,6 @@
       function remove_html(html) {
         if ((html === null) || (html === '')) return '';
         else text = html.toString();
-        return text.replace( /(<([^>]+)>)/ig, '');
+        return text.replace(/(<([^>]+)>)/ig, '');
      }
   };
