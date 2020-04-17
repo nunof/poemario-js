@@ -432,8 +432,7 @@
       // Public method to retrieve number of possible poems
       Poemario.prototype.get_num_max_poems = function (pnum) {
           if (DEBUG) console.log("max_num_poems " + JSON.stringify(max_num_poems));
-          if (max_num_poems[parseInt(pnum) - 1] > Number.MAX_SAFE_INTEGER) return ">="+Number.MAX_SAFE_INTEGER.toLocaleString()
-          else return max_num_poems[parseInt(pnum) - 1].toLocaleString();
+          return max_num_poems[parseInt(pnum) - 1].toLocaleString();
       }
 
       // Public method to post to local WP - the instantaneous poem text
@@ -1179,18 +1178,19 @@
 
       //Private method for creating and filling array with the contents of a txt file with URL
       function calculate_max_num_poems(pnum, poem) {
-            _tmp_all = 1;
-            //console.log("window obj " + unwrap_circular_obj(window));
-            for (i = 0; i < poem.length; i++) {
-                _tmp_vers = 1;
-                _taxons = poem[i][2].split(",");
-                for (j = 0; j < _taxons.length; j++) {
-                    if (typeof _taxons[j] !== 'undefined' && typeof window[_taxons[j]] !== 'undefined') 
-                        _tmp_vers *= window[_taxons[j]].length;
-                }
-                _tmp_all *= _tmp_vers;
+        //use BigInts
+        _tmp_all = 1n;
+        //console.log("window obj " + unwrap_circular_obj(window));
+        for (i = 0; i < poem.length; i++) {
+            _tmp_vers = 1n;
+            _taxons = poem[i][2].split(",");
+            for (j = 0; j < _taxons.length; j++) {
+                if (typeof _taxons[j] !== 'undefined' && typeof window[_taxons[j]] !== 'undefined')
+                    _tmp_vers *= BigInt(window[_taxons[j]].length);
             }
-            max_num_poems[pnum-1] = _tmp_all;
+            _tmp_all *= BigInt(_tmp_vers);
+        }
+        max_num_poems[pnum-1] = _tmp_all;
       }
 
       //Private method to stringify circular objects
