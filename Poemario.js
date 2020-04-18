@@ -939,8 +939,10 @@
         }
 
         if (_poem_speed == 0 && _first_mode == POEM_STATIC) set_verse_html(String(arr[1]), pnum, lnum);
-        else set_verse_txt(String(arr[1]), pnum, lnum);
-        scroll_bottom("#container" + pnum);
+        else {
+            set_verse_txt(String(arr[1]), pnum, lnum);
+            scroll_bottom("#container" + pnum);
+        }
       };
 
       //Private method for adding named text on canvas
@@ -1018,7 +1020,11 @@
           if (_type_mode == TYPE_CONSTELLATION) {
               $("#canvas" + pnum).attr('height', ($('#container' + pnum).height() - 20) + 'px');
               $("#canvas" + pnum).attr('width', ($('#container' + pnum).width() - 20) + 'px');
-          } else scroll_bottom("#container" + pnum);
+          } 
+          
+          if (_first_mode === POEM_STATIC) {
+              scroll_bottom("#container" + pnum);
+          }
       };
 
 
