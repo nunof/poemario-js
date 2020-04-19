@@ -432,7 +432,7 @@
       // Public method to retrieve number of possible poems
       Poemario.prototype.get_num_max_poems = function (pnum) {
           if (DEBUG) console.log("max_num_poems " + JSON.stringify(max_num_poems));
-          return max_num_poems[parseInt(pnum) - 1] === 0 ? '∞' : max_num_poems[parseInt(pnum) - 1].toLocaleString();
+          return max_num_poems[parseInt(pnum) - 1];
       }
 
       // Public method to post to local WP - the instantaneous poem text
@@ -560,7 +560,7 @@
                       }
                   });
 
-                  calculate_max_num_poems(pnum, poem);
+                  has_bigint() ? calculate_max_num_poems_big(pnum, poem) : calculate_max_num_poems_int(pnum, poem);
 
                   //load element audio into objs stored in DOM window dictionary
                   var $audio = $parsed.find("audio");
@@ -1182,14 +1182,14 @@
 
       }
 
-      //Private method for creating and filling array with the contents of a txt file with URL
-      function calculate_max_num_poems(pnum, poem) {
-        //use BigInts
-        _tmp_all = 1n;
+      //Private method for creating and filling array with the contents of a txt file with URL - using BigInt
+      function calculate_max_num_poems_big(pnum, poem) {
         //console.log("window obj " + unwrap_circular_obj(window));
         try {
+            //use BigInts
+            _tmp_all = BigInt(1);
             for (i = 0; i < poem.length; i++) {
-                _tmp_vers = 1n;
+                _tmp_vers = BigInt(1);
                 _taxons = poem[i][2].split(",");
                 for (j = 0; j < _taxons.length; j++) {
                     if (typeof _taxons[j] !== 'undefined' && typeof window[_taxons[j]] !== 'undefined')
@@ -1197,12 +1197,30 @@
                 }
                 _tmp_all *= BigInt(_tmp_vers);
             }
-            max_num_poems[pnum-1] = _tmp_all;
+            max_num_poems[pnum-1] = _tmp_all.toLocaleString();
         }
         catch(err) {
-            max_num_poems[pnum-1] = 0;
+            max_num_poems[pnum-1] = '∞';
         }
+      }
 
+      //Private method for creating and filling array with the contents of a txt file with URL - using Integer
+      function calculate_max_num_poems_int(pnum, poem) {
+        _tmp_all = 1;
+        //console.log("window obj " + unwrap_circular_obj(window));
+        for (i = 0; i < poem.length; i++) {
+            _tmp_vers = 1;
+            _taxons = poem[i][2].split(",");
+            for (j = 0; j < _taxons.length; j++) {
+                if (typeof _taxons[j] !== 'undefined' && typeof window[_taxons[j]] !== 'undefined') 
+                    _tmp_vers *= window[_taxons[j]].length;
+            }
+            _tmp_all *= _tmp_vers;
+        }
+        if (_tmp_all > Number.MAX_SAFE_INTEGER) 
+            max_num_poems[pnum-1] = ">="+Number.MAX_SAFE_INTEGER.toLocaleString()
+        else 
+            max_num_poems[parseInt(pnum) - 1] = _tmp_all.toLocaleString();              
       }
 
       //Private method to stringify circular objects
@@ -1227,5 +1245,15 @@
         if ((html === null) || (html === '')) return '';
         else text = html.toString();
         return text.replace(/(<([^>]+)>)/ig, '');
+     }
+
+     function has_bigint() {
+         try {
+             var test = BigInt(1);
+             return true;
+         }
+         catch {
+             return false;
+         }
      }
   };
