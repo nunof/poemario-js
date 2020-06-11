@@ -436,30 +436,36 @@
       }
 
       // Public method to post to local WP - the instantaneous poem text
-      Poemario.prototype.text_wp = function (pnum, poem_user, wp_dir) {
-          if (_type_mode != TYPE_CONSTELLATION) {
-              if (typeof pnum === 'undefined') pnum = 1;
-              if (DEBUG) console.log("WP: text post called for pnum " + pnum);
+      Poemario.prototype.text_wp = function (pnum, poem_user, wp_dir, callback) {
+        if (_type_mode != TYPE_CONSTELLATION) {
+            if (typeof pnum === 'undefined') pnum = 1;
+            if (DEBUG) console.log("WP: text post called for pnum " + pnum);
 
-              var ptxt = "";
-              for (var i = 0; i < live[pnum].length; i++) {
-                  ptxt += live[pnum][i][1] + "\n";
-              }
-              var clean_txt = ptxt.replace(/_/g, " ");
+            var ptxt = "";
+            for (var i = 0; i < live[pnum].length; i++) {
+                ptxt += live[pnum][i][1] + "\n";
+            }
+            var clean_txt = ptxt.replace(/_/g, " ");
 
-              var wp_req = new XMLHttpRequest();
-              wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
-              wp_req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-              var params = 'poem=' + encodeURIComponent(clean_txt);
-              if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
-              if (typeof wp_dir !== 'undefined') params += "&wp_dir=" + encodeURIComponent(wp_dir);
-              wp_req.send(params);
-              if (DEBUG) console.log("WP: posted");
-          }
+            var wp_req = new XMLHttpRequest();
+            wp_req.open("POST", "/cgi-bin/wp_text.pl", true);
+            wp_req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            var params = 'poem=' + encodeURIComponent(clean_txt);
+            if (typeof poem_user !== 'undefined') params += "&poem_user=" + encodeURIComponent(poem_user);
+            if (typeof wp_dir !== 'undefined') params += "&wp_dir=" + encodeURIComponent(wp_dir);
+
+            wp_req.onreadystatechange = function() {
+                if (wp_req.readyState == 4 && typeof callback !== 'undefined')
+                    callback(wp_req.status == 200);
+            };
+
+            wp_req.send(params);
+            if (DEBUG) console.log("WP: posted");
+        }
       };
 
       // Public method to post to local WP - the instantaneous poem with the associated image
-      Poemario.prototype.image_wp = function (pnum, poem_user, wp_dir) {
+      Poemario.prototype.image_wp = function (pnum, poem_user, wp_dir, callback) {
           if (_type_mode == TYPE_CONSTELLATION) {
 
               if (typeof pnum === 'undefined') pnum = 1;
@@ -489,6 +495,11 @@
               var obj_canvas = document.getElementById('canvas' + pnum);
               var ctx_canvas = document.getElementById('canvas' + pnum).getContext('2d');
               ctx_canvas.globalCompositeOperation = "destination-over";
+
+              wp_req.onreadystatechange = function() {
+                if (wp_req.readyState == 4 && typeof callback !== 'undefined')
+                    callback(wp_req.status == 200);
+              };
 
               var img = new Image();
               img.onload = function () {

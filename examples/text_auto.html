@@ -27,13 +27,18 @@
         pmr.txt_start();
       }
 
+      function success_of_post(ok) {
+        if (ok)
+          $("#msgconfirmation").html('<p>Arigato! You should be able to see your poem <a href="https://telepoesis.net/poemario" target="_blank">here</a></p>');
+        else 
+          $("#msgconfirmation").html('<p>Oh, there was an error</p>');
+        $("#msgconfirmation").dialog("open");
+      }
+
       function post_text(pnum) {
         var author = prompt("You are about to post to Poemario blog, what's your name?", "Harry Potter");
 
-        if (author != null) {
-          pmr.text_wp(1, author);
-          $("#msgconfirmation").dialog("open");
-        } 
+        if (author != null) pmr.text_wp(1, author, null, success_of_post);
       }
 
       $(document).ready(function(){
