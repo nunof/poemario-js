@@ -7,8 +7,9 @@ from xmlrpc import client
 
 
 def get_rand_title():
-	sc = set(['\n', '.', ','])
-	pt1 = ''.join([c for c in poem_text if c not in sc])
+	pt0 = poem_text.replace('\n', ' ')
+	sc = set(['.', ','])
+	pt1 = ''.join([c for c in pt0 if c not in sc])
 	pta = pt1.split()
 	title = ''
 	n = random.randint(2, 4)
