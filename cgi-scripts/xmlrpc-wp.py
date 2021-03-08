@@ -29,7 +29,8 @@ else:
 	exit(1)
 
 user = 'cgi'
-passwd = '9s8^5dPF2eXL#3QD8OcAwaLi'
+with open ("wp-python-password.txt", "r") as f_passwd:
+    passwd=f_passwd.read().replace('\n', '')
 server = client.ServerProxy('http://telepoesis.net/poemario/xmlrpc.php')
 blog_id = 0
 
