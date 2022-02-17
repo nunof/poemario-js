@@ -34,11 +34,15 @@
   }
 
   //Public consts
+  // poem structures
   const POEM_STATIC = 1;
   const POEM_TYPED = 2;
+  // flows
   const FLOW_STATIC_ONE = 1;
-  const FLOW_GROWING = 2;
-  const FLOW_STATIC_ALL = 3;
+  const FLOW_STATIC_ALL = 2;
+  const FLOW_GROWING = 3;
+  const FLOW_GROWING_REV = 4;
+    // types
   const TYPE_CONSTELLATION = 0;
   const TYPE_LINE = 1;
   const TYPE_CHAR = 2;
@@ -55,8 +59,9 @@
 
     * flow_mode (default=2):
   	1 => static length poem, each time replacing one word in one vers
-  	2 => growing length_poem, adding verses ad infinitum
-    3 => static length poem, each time replacing all words in one vers
+    2 => static length poem, each time replacing all words in one vers
+    3 => growing length_poem, appending verses ad infinitum
+    4 => growing reversed length_poem, inserting verses at top of the page ad infinitum
     # TODO: static length poem, each time replacing all words in all verses
 
     * type_mode (default=2):
@@ -171,7 +176,7 @@
               return _flow_mode;
           },
           set: function (newval) {
-              _flow_mode = newval;
+              if (newval >= 1 && newval <= 4) _flow_mode = newval;
           }
       });
 
@@ -181,7 +186,7 @@
               return _type_mode;
           },
           set: function (newval) {
-              _type_mode = newval;
+            if (newval >= 0 && newval <= 2) _type_mode = newval;
           }
       });
 
@@ -803,7 +808,7 @@
               else $('#wo-' + pnum + '-' + typing_pos.bc + '-' + typing_pos.lnum + '-' + typing_pos.wnum).text(new_word.replace(/_/g, " ").trim());
           }
           //dynamic length poem, vers by vers
-          else if (_flow_mode == FLOW_GROWING && _type_mode == TYPE_LINE) {
+          else if ((_flow_mode == FLOW_GROWING || _flow_mode == FLOW_GROWING_REV) && _type_mode == TYPE_LINE) {
               window["block_counter" + pnum] = window["block_counter" + pnum] + 1;
               for (i = 0; i < live[pnum].length; i++) {
                   add_verse(live[pnum][i], pnum, i);
@@ -921,7 +926,7 @@
               var clean_line = line.replace(/_/g, " ");
               $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).text(clean_line);
               //we update scroll after every first char in a vers
-              if (line.length == 1) scroll_bottom("#container" + pnum);
+              if (_flow_mode != FLOW_GROWING_REV && line.length == 1) scroll_bottom("#container" + pnum);
           }
           //render empty line as new line
           else $("#pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum)).html("<BR>");
@@ -937,7 +942,10 @@
       //Private method for adding named HTML paragraph
       function add_verse(arr, pnum, lnum) {
 
-        $("#container" + pnum).append("<p id=\"pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + "\" style=\"text-indent: " + arr[0] + "em;\" class=\"vers\"></p>");
+        if (_flow_mode == FLOW_GROWING)
+            $("#container" + pnum).append("<p id=\"pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + "\" style=\"text-indent: " + arr[0] + "em;\" class=\"vers\"></p>");
+        else if (_flow_mode == FLOW_GROWING_REV)
+            $("#container" + pnum).prepend("<p id=\"pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum) + "\" style=\"text-indent: " + arr[0] + "em;\" class=\"vers\"></p>");
 
         if (typeof _font_config !== "undefined") {
             var elem = document.getElementById("pvers" + pnum + "-" + String(window["block_counter" + pnum]) + "-" + String(lnum));
@@ -952,7 +960,7 @@
         if (_poem_speed == 0 && _first_mode == POEM_STATIC) set_verse_html(String(arr[1]), pnum, lnum);
         else {
             set_verse_txt(String(arr[1]), pnum, lnum);
-            scroll_bottom("#container" + pnum);
+            if (_flow_mode == FLOW_GROWING) scroll_bottom("#container" + pnum);
         }
       };
 
