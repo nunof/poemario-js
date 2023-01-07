@@ -603,7 +603,7 @@
                         for (j = 0; j < o.length; j++) {
                             w = parseInt(o[j] - 1);
                             _w = v[w];
-                            v[w] = '<a href="#" data-poem=' + encodeURIComponent(JSON.stringify(poem)) + 
+                            v[w] = '<a href="#/" data-poem=' + encodeURIComponent(JSON.stringify(poem)) + 
                                 ' data-t1= ' + id_timer1 + 
                                 ' data-t2= ' + id_timer2 + 
                                 '">' + _w + '</a>';
